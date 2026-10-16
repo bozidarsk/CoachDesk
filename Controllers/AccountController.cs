@@ -50,14 +50,17 @@ public class AccountController : Controller
 		if (!ModelState.IsValid)
 			return View(model);
 
-		var user = new ApplicationUser() { FullName = model.FullName };
+		var user = new ApplicationUser()
+		{
+			UserName = model.Email,
+			Email = model.Email,
+			FullName = model.FullName,
+		};
+
 		var result = await userManager.CreateAsync(user, model.Password);
 
 		if (result.Succeeded)
 		{
-			await userManager.SetUserNameAsync(user, model.Email);
-			await userManager.SetEmailAsync(user, model.Email);
-
 			return LocalRedirect(returnUrl);
 		}
 		else
