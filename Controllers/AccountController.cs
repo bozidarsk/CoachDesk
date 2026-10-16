@@ -31,6 +31,8 @@ public class AccountController : Controller
 	{
 		returnUrl ??= "/";
 
+		ViewData["ReturnUrl"] = returnUrl;
+
 		if (!ModelState.IsValid)
 		{
 			ModelState.AddModelError(string.Empty, "Invalid request data was provided.");
@@ -84,6 +86,10 @@ public class AccountController : Controller
 	[HttpPost, AllowAnonymous]
 	public async Task<IActionResult> Login(LoginInputModel model, string returnUrl)
 	{
+		returnUrl ??= "/";
+
+		ViewData["ReturnUrl"] = returnUrl;
+
 		if (!ModelState.IsValid)
 		{
 			ModelState.AddModelError(string.Empty, "Invalid request data was provided.");
