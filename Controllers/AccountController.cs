@@ -27,7 +27,7 @@ public class AccountController : Controller
 	}
 
 	[HttpPost, AllowAnonymous]
-	public async Task<IActionResult> Register(RegisterInputModel model, string? returnUrl)
+	public async Task<IActionResult> Register(AccountRegisterInputModel model, string? returnUrl)
 	{
 		returnUrl ??= "/";
 
@@ -84,7 +84,7 @@ public class AccountController : Controller
 	}
 
 	[HttpPost, AllowAnonymous]
-	public async Task<IActionResult> Login(LoginInputModel model, string returnUrl)
+	public async Task<IActionResult> Login(AccountLoginInputModel model, string returnUrl)
 	{
 		returnUrl ??= "/";
 
