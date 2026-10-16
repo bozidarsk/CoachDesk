@@ -1,11 +1,10 @@
-using CoachDesk.Data.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using CoachDesk.Data.Models;
 
 namespace CoachDesk.Data;
 
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
 	public virtual DbSet<UserCredentials> UserCredentials { set; get; }
 	public virtual DbSet<Coach> Coaches { set; get; }

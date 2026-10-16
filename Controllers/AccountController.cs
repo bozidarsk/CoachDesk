@@ -1,16 +1,17 @@
 using System.Text.RegularExpressions;
-using CoachDesk.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using CoachDesk.Data;
+using CoachDesk.ViewModels;
 using static CoachDesk.Common.EntityValidation.User;
 
 namespace CoachDesk.Controllers;
 
 public class AccountController : Controller
 {
-	private readonly UserManager<IdentityUser> userManager;
-	private readonly SignInManager<IdentityUser> signInManager;
+	private readonly UserManager<ApplicationUser> userManager;
+	private readonly SignInManager<ApplicationUser> signInManager;
 
 	[Authorize]
 	public IActionResult Index() => View();
@@ -49,7 +50,7 @@ public class AccountController : Controller
 		if (!ModelState.IsValid)
 			return View(model);
 
-		var user = new IdentityUser();
+		var user = new ApplicationUser() { FullName = model.FullName };
 		var result = await userManager.CreateAsync(user, model.Password);
 
 		if (result.Succeeded)
@@ -139,7 +140,7 @@ public class AccountController : Controller
 		return true;
 	}
 
-	public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+	public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
 	{
 		this.userManager = userManager;
 		this.signInManager = signInManager;
