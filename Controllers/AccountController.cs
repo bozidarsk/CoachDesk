@@ -45,7 +45,7 @@ public class AccountController : Controller
 			ModelState.AddModelError(nameof(model.Password), $"Password must be between {PasswordMinLength} and {PasswordMaxLength} characters and contain letters and digits.");
 
 		if (await userManager.FindByEmailAsync(model.Email) != null)
-			ModelState.AddModelError(string.Empty, "User with the same email address already exists.");
+			ModelState.AddModelError(nameof(model.Email), "User with the same email address already exists.");
 
 		if (!ModelState.IsValid)
 			return View(model);
@@ -58,20 +58,17 @@ public class AccountController : Controller
 		};
 
 		var result = await userManager.CreateAsync(user, model.Password);
-
-		if (result.Succeeded)
-		{
-			await signInManager.SignInAsync(user, isPersistent: model.StayLoggedIn);
-
-			return LocalRedirect(returnUrl);
-		}
-		else
+		if (!result.Succeeded)
 		{
 			foreach (var error in result.Errors)
 				ModelState.AddModelError(string.Empty, error.Description);
 
 			return View(model);
-	 	}
+		}
+
+		await signInManager.SignInAsync(user, isPersistent: model.StayLoggedIn);
+
+		return LocalRedirect(returnUrl);
 	}
 
 	[HttpGet, AllowAnonymous]
@@ -104,17 +101,14 @@ public class AccountController : Controller
 			return View(model);
 
 		var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: model.StayLoggedIn, lockoutOnFailure: false);
-
-		if (result.Succeeded)
-		{
-			return LocalRedirect(returnUrl);
-		}
-		else
+		if (!result.Succeeded)
 		{
 			ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
 			return View(model);
 		}
+
+		return LocalRedirect(returnUrl);
 	}
 
 	[Authorize]
