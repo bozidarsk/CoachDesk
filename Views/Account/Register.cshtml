@@ -1,0 +1,42 @@
+@model RegisterInputModel
+
+@{
+	ViewData["Title"] = "Register";
+}
+
+<div class="card border-secondary mb-3" style="margin: 0px 20%">
+	<div class="card-header">Register</div>
+	<div class="card-body">
+		<form asp-area="" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+			<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+			<div class="form-floating mb-3">
+				<input asp-for="Email" class="form-control" type="email" aria-required="true" placeholder=""/>
+				<label asp-for="Email" class="form-label"></label>
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+			<div class="form-floating mb-3">
+				<input asp-for="FullName" class="form-control" type="text" aria-required="true" placeholder=""/>
+				<label asp-for="FullName" class="form-label"></label>
+				<span asp-validation-for="FullName" class="text-danger"></span>
+			</div>
+			<div class="form-floating mb-3">
+				<input asp-for="Password" class="form-control" type="password" aria-required="true" placeholder="" autocomplete="off"/>
+				<label asp-for="Password" class="form-label"></label>
+				<span asp-validation-for="Password" class="text-danger"></span>
+			</div>
+            <div class="checkbox mb-3">
+				<input asp-for="RegisterAsCoach" class="form-check-input" type="checkbox"/>
+				<label asp-for="RegisterAsCoach" class="form-label"></label>
+            </div>
+			<div class="checkbox mb-3">
+				<input asp-for="StayLoggedIn" class="form-check-input" type="checkbox"/>
+				<label asp-for="StayLoggedIn" class="form-label"></label>
+            </div>
+			<input type="submit" class="btn btn-primary" value="Register"></input>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial"/>
+}

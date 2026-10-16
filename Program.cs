@@ -1,21 +1,33 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
+using CoachDesk.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 	{
 		options.SignIn.RequireConfirmedAccount = false;
+		options.Password.RequiredLength = EntityValidation.User.PasswordMinLength;
 		options.Password.RequireDigit = true;
-		options.Password.RequiredLength = 8;
 		options.Password.RequireLowercase = false;
 		options.Password.RequireUppercase = false;
+		options.Password.RequireNonAlphanumeric = false;
+		options.User.RequireUniqueEmail = true;
 	}
-).AddEntityFrameworkStores<ApplicationDbContext>();
+)
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.LoginPath = "/Account/Login";
+	options.LogoutPath = "/Account/Logout";
+	options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 var app = builder.Build();
 
@@ -28,8 +40,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
 
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -38,8 +51,5 @@ app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}"
 ).WithStaticAssets();
-
-app.MapRazorPages()
-.WithStaticAssets();
 
 app.Run();

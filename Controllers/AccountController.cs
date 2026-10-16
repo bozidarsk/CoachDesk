@@ -1,0 +1,147 @@
+using System.Text.RegularExpressions;
+using CoachDesk.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using static CoachDesk.Common.EntityValidation.User;
+
+namespace CoachDesk.Controllers;
+
+public class AccountController : Controller
+{
+	private readonly UserManager<IdentityUser> userManager;
+	private readonly SignInManager<IdentityUser> signInManager;
+
+	[Authorize]
+	public IActionResult Index() => View();
+
+	[HttpGet, AllowAnonymous]
+	public IActionResult Register(string? returnUrl)
+	{
+		returnUrl ??= "/";
+
+		ViewData["ReturnUrl"] = returnUrl;
+
+		return View();
+	}
+
+	[HttpPost, AllowAnonymous]
+	public async Task<IActionResult> Register(RegisterInputModel model, string? returnUrl)
+	{
+		returnUrl ??= "/";
+
+		if (!ModelState.IsValid)
+		{
+			ModelState.AddModelError(string.Empty, "Invalid request data was provided.");
+
+			return View(model);
+		}
+
+		if (!ValidateEmail(model.Email))
+			ModelState.AddModelError(nameof(model.Email), "Invalid email address was provided.");
+
+		if (!ValidatePassword(model.Password))
+			ModelState.AddModelError(nameof(model.Password), $"Password must be between {PasswordMinLength} and {PasswordMaxLength} characters and contain letters and digits.");
+
+		if (await userManager.FindByEmailAsync(model.Email) != null)
+			ModelState.AddModelError(string.Empty, "User with the same email address already exists.");
+
+		if (!ModelState.IsValid)
+			return View(model);
+
+		var user = new IdentityUser();
+		var result = await userManager.CreateAsync(user, model.Password);
+
+		if (result.Succeeded)
+		{
+			await userManager.SetUserNameAsync(user, model.Email);
+			await userManager.SetEmailAsync(user, model.Email);
+
+			return LocalRedirect(returnUrl);
+		}
+		else
+		{
+			foreach (var error in result.Errors)
+				ModelState.AddModelError(string.Empty, error.Description);
+
+			return View(model);
+	 	}
+	}
+
+	[HttpGet, AllowAnonymous]
+	public IActionResult Login(string? returnUrl)
+	{
+		returnUrl ??= "/";
+
+		ViewData["ReturnUrl"] = returnUrl;
+
+		return View();
+	}
+
+	[HttpPost, AllowAnonymous]
+	public async Task<IActionResult> Login(LoginInputModel model, string returnUrl)
+	{
+		if (!ModelState.IsValid)
+		{
+			ModelState.AddModelError(string.Empty, "Invalid request data was provided.");
+
+			return View(model);
+		}
+
+		if (!ValidateEmail(model.Email))
+			ModelState.AddModelError(nameof(model.Email), "Invalid email address was provided.");
+
+		if (!ValidatePassword(model.Password))
+			ModelState.AddModelError(nameof(model.Password), $"Password must be between {PasswordMinLength} and {PasswordMaxLength} characters and contain letters and digits.");
+
+		if (!ModelState.IsValid)
+			return View(model);
+
+		var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: model.StayLoggedIn, lockoutOnFailure: false);
+
+		if (result.Succeeded)
+		{
+			return LocalRedirect(returnUrl);
+		}
+		else
+		{
+			ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+
+			return View(model);
+		}
+	}
+
+	[Authorize]
+	public async Task<IActionResult> Logout(string? returnUrl)
+	{
+		returnUrl ??= "/";
+
+		await signInManager.SignOutAsync();
+
+		return LocalRedirect(returnUrl);
+	}
+
+	public IActionResult AccessDenied() => View();
+
+	private bool ValidateEmail(string email) => string.IsNullOrWhiteSpace(email) || Regex.IsMatch(email, "[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+");
+
+	private bool ValidatePassword(string password)
+	{
+		if (string.IsNullOrEmpty(password))
+			return false;
+
+		if (password.Length < PasswordMinLength || password.Length > PasswordMaxLength)
+			return false;
+
+		if (!password.Any(x => char.IsDigit(x)))
+			return false;
+
+		return true;
+	}
+
+	public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+	{
+		this.userManager = userManager;
+		this.signInManager = signInManager;
+	}
+}
