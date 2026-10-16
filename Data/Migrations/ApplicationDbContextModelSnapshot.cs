@@ -99,12 +99,13 @@ namespace CoachDesk.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("UserCredentialsId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserCredentialsId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Clients");
                 });
@@ -117,12 +118,13 @@ namespace CoachDesk.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("UserCredentialsId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserCredentialsId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Coaches");
                 });
@@ -185,34 +187,6 @@ namespace CoachDesk.Data.Migrations
                     b.HasIndex("CoachId");
 
                     b.ToTable("Sessions");
-                });
-
-            modelBuilder.Entity("CoachDesk.Data.Models.UserCredentials", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PasswordHash")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserCredentials");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -350,24 +324,24 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Client", b =>
                 {
-                    b.HasOne("CoachDesk.Data.Models.UserCredentials", "UserCredentials")
+                    b.HasOne("CoachDesk.Data.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserCredentialsId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserCredentials");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachDesk.Data.Models.Coach", b =>
                 {
-                    b.HasOne("CoachDesk.Data.Models.UserCredentials", "UserCredentials")
+                    b.HasOne("CoachDesk.Data.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserCredentialsId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserCredentials");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachDesk.Data.Models.Membership", b =>

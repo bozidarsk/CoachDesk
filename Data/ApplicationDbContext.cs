@@ -6,7 +6,6 @@ namespace CoachDesk.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
-	public virtual DbSet<UserCredentials> UserCredentials { set; get; }
 	public virtual DbSet<Coach> Coaches { set; get; }
 	public virtual DbSet<Client> Clients { set; get; }
 	public virtual DbSet<Membership> Memberships { set; get; }

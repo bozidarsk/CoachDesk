@@ -8,9 +8,9 @@ public class Coach
 	[Key]
 	public int Id { set; get; }
 
-	[Required, ForeignKey(nameof(UserCredentials))]
-	public int UserCredentialsId { set; get; }
-	public virtual UserCredentials UserCredentials { set; get; } = null!;
+	[Required, ForeignKey(nameof(User))]
+	public string UserId { set; get; } = null!;
+	public virtual ApplicationUser User { set; get; } = null!;
 
 	public virtual ICollection<Session> BookedSessions { set; get; } = [];
 
