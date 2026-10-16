@@ -61,6 +61,8 @@ public class AccountController : Controller
 
 		if (result.Succeeded)
 		{
+			await signInManager.SignInAsync(user, isPersistent: model.StayLoggedIn);
+
 			return LocalRedirect(returnUrl);
 		}
 		else
