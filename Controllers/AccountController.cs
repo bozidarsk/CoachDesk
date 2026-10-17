@@ -10,6 +10,7 @@ namespace CoachDesk.Controllers;
 
 public class AccountController : Controller
 {
+	private readonly ApplicationDbContext dbContext;
 	private readonly UserManager<ApplicationUser> userManager;
 	private readonly SignInManager<ApplicationUser> signInManager;
 
@@ -67,6 +68,13 @@ public class AccountController : Controller
 
 			return View(model);
 		}
+
+		if (model.RegisterAsCoach)
+			await dbContext.Coaches.AddAsync(new() { UserId = user.Id });
+		else
+			await dbContext.Clients.AddAsync(new() { UserId = user.Id });
+
+		await dbContext.SaveChangesAsync();
 
 		await signInManager.SignInAsync(user, isPersistent: model.StayLoggedIn);
 
@@ -127,6 +135,17 @@ public class AccountController : Controller
 		return LocalRedirect(returnUrl);
 	}
 
+	[Authorize]
+	public async Task<IActionResult> Delete()
+	{
+		var user = (await userManager.GetUserAsync(User))!;
+
+		await signInManager.SignOutAsync();
+		await userManager.DeleteAsync(user);
+
+		return LocalRedirect("/");
+	}
+
 	public IActionResult AccessDenied() => View();
 
 	private bool ValidateEmail(string email) => string.IsNullOrWhiteSpace(email) || Regex.IsMatch(email, "[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+");
@@ -145,8 +164,9 @@ public class AccountController : Controller
 		return true;
 	}
 
-	public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+	public AccountController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
 	{
+		this.dbContext = dbContext;
 		this.userManager = userManager;
 		this.signInManager = signInManager;
 	}
