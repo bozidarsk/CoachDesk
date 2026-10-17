@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CoachDesk.Data;
 using CoachDesk.ViewModels;
+using static CoachDesk.Common.ApplicationConstants;
 using static CoachDesk.Common.EntityValidation.User;
 
 namespace CoachDesk.Controllers;
@@ -76,6 +77,7 @@ public class AccountController : Controller
 
 		await dbContext.SaveChangesAsync();
 
+		await userManager.AddToRoleAsync(user, model.RegisterAsCoach ? CoachRole : ClientRole);
 		await signInManager.SignInAsync(user, isPersistent: model.StayLoggedIn);
 
 		return LocalRedirect(returnUrl);
