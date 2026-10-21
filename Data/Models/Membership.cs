@@ -9,12 +9,11 @@ public class Membership
 	public int Id { set; get; }
 
 	[Required]
-	public string Name { set; get; } = null!;
+	public DateTime ActivatedOn { set; get; }
 
-	[DataType(DataType.Currency), Column(TypeName = "decimal(19,4)")]
-	public decimal Price { set; get; }
+	public int TimesUsed { set; get; } = 0;
 
-	public int? Count { set; get; }
-
-	public DateTime? ExpirationDate { set; get; }
+	[Required, ForeignKey(nameof(MembershipPlan))]
+	public int MembershipPlanId { set; get; }
+	public virtual MembershipPlan MembershipPlan { set; get; } = null!;
 }

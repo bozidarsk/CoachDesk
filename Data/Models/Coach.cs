@@ -14,5 +14,5 @@ public class Coach
 
 	public virtual ICollection<Session> BookedSessions { set; get; } = [];
 
-	public virtual ICollection<Membership> Memberships { set; get; } = [];
+	public virtual ICollection<MembershipPlan> MembershipPlans { set; get; } = [];
 }

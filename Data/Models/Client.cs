@@ -13,4 +13,6 @@ public class Client
 	public virtual ApplicationUser User { set; get; } = null!;
 
 	public virtual ICollection<Session> BookedSessions { set; get; } = [];
+
+	public virtual ICollection<Membership> ActiveMemberships { set; get; } = [];
 }

@@ -137,14 +137,43 @@ namespace CoachDesk.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("ActivatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MembershipPlanId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TimesUsed")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("MembershipPlanId");
+
+                    b.ToTable("Memberships");
+                });
+
+            modelBuilder.Entity("CoachDesk.Data.Models.MembershipPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int?>("CoachId")
                         .HasColumnType("int");
 
                     b.Property<int?>("Count")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("time");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -157,7 +186,7 @@ namespace CoachDesk.Data.Migrations
 
                     b.HasIndex("CoachId");
 
-                    b.ToTable("Memberships");
+                    b.ToTable("MembershipPlans");
                 });
 
             modelBuilder.Entity("CoachDesk.Data.Models.Session", b =>
@@ -177,7 +206,7 @@ namespace CoachDesk.Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<TimeOnly>("Duration")
+                    b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
                     b.HasKey("Id");
@@ -346,8 +375,23 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Membership", b =>
                 {
+                    b.HasOne("CoachDesk.Data.Models.Client", null)
+                        .WithMany("ActiveMemberships")
+                        .HasForeignKey("ClientId");
+
+                    b.HasOne("CoachDesk.Data.Models.MembershipPlan", "MembershipPlan")
+                        .WithMany()
+                        .HasForeignKey("MembershipPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MembershipPlan");
+                });
+
+            modelBuilder.Entity("CoachDesk.Data.Models.MembershipPlan", b =>
+                {
                     b.HasOne("CoachDesk.Data.Models.Coach", null)
-                        .WithMany("Memberships")
+                        .WithMany("MembershipPlans")
                         .HasForeignKey("CoachId");
                 });
 
@@ -423,6 +467,8 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Client", b =>
                 {
+                    b.Navigation("ActiveMemberships");
+
                     b.Navigation("BookedSessions");
                 });
 
@@ -430,7 +476,7 @@ namespace CoachDesk.Data.Migrations
                 {
                     b.Navigation("BookedSessions");
 
-                    b.Navigation("Memberships");
+                    b.Navigation("MembershipPlans");
                 });
 #pragma warning restore 612, 618
         }

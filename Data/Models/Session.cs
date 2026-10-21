@@ -13,7 +13,7 @@ public class Session
 	public DateTime Date { set; get; }
 
 	[Required]
-	public TimeOnly Duration { set; get; }
+	public TimeSpan Duration { set; get; }
 
 	[Required, ForeignKey(nameof(Coach))]
 	public int CoachId { set; get; }
