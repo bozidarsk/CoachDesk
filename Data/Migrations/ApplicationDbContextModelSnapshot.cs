@@ -381,9 +381,12 @@ namespace CoachDesk.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.MembershipPlan", b =>
                 {
-                    b.HasOne("CoachDesk.Data.Models.Coach", null)
+                    b.HasOne("CoachDesk.Data.Models.Coach", "Coach")
                         .WithMany("MembershipPlans")
-                        .HasForeignKey("CoachId");
+                        .HasForeignKey("CoachId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Coach");
                 });
 
             modelBuilder.Entity("CoachDesk.Data.Models.Session", b =>
