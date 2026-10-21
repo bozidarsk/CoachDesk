@@ -6,7 +6,7 @@ namespace CoachDesk.Data.Models;
 public class Membership
 {
 	[Key]
-	public int Id { set; get; }
+	public Guid Id { set; get; }
 
 	[Required]
 	public DateTime ActivatedOn { set; get; }
@@ -14,6 +14,6 @@ public class Membership
 	public int TimesUsed { set; get; } = 0;
 
 	[Required, ForeignKey(nameof(MembershipPlan))]
-	public int MembershipPlanId { set; get; }
+	public Guid MembershipPlanId { set; get; }
 	public virtual MembershipPlan MembershipPlan { set; get; } = null!;
 }

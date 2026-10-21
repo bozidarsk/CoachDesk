@@ -7,7 +7,7 @@ namespace CoachDesk.Data.Models;
 public class Session
 {
 	[Key]
-	public int Id { set; get; }
+	public Guid Id { set; get; }
 
 	[Required]
 	public DateTime Date { set; get; }
@@ -16,12 +16,12 @@ public class Session
 	public TimeSpan Duration { set; get; }
 
 	[Required, ForeignKey(nameof(Coach))]
-	public int CoachId { set; get; }
+	public Guid CoachId { set; get; }
 	[DeleteBehavior(DeleteBehavior.NoAction)]
 	public virtual Coach Coach { set; get; } = null!;
 
 	[Required, ForeignKey(nameof(Client))]
-	public int ClientId { set; get; }
+	public Guid ClientId { set; get; }
 	[DeleteBehavior(DeleteBehavior.NoAction)]
 	public virtual Client Client { set; get; } = null!;
 }

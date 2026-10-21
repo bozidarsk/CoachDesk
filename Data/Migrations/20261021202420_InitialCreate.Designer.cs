@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CoachDesk.Data.Migrations
+namespace CoachDesk.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261021091851_AddMembershipPlans")]
-    partial class AddMembershipPlans
+    [Migration("20261021202420_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,11 +96,9 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Client", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -115,11 +113,9 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Coach", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -134,20 +130,18 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Membership", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ActivatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ClientId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("ClientId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MembershipPlanId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MembershipPlanId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("TimesUsed")
                         .HasColumnType("int");
@@ -163,24 +157,23 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.MembershipPlan", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CoachId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("CoachId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Count")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("Duration")
-                        .HasColumnType("time");
+                    b.Property<int?>("Duration")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(19,4)");
@@ -194,17 +187,15 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Session", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CoachId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CoachId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");

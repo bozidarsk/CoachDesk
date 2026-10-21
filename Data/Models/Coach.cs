@@ -6,7 +6,7 @@ namespace CoachDesk.Data.Models;
 public class Coach
 {
 	[Key]
-	public int Id { set; get; }
+	public Guid Id { set; get; }
 
 	[Required, ForeignKey(nameof(User))]
 	public string UserId { set; get; } = null!;

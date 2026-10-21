@@ -1,14 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static CoachDesk.Common.EntityValidation.MembershipPlan;
 
 namespace CoachDesk.Data.Models;
 
 public class MembershipPlan
 {
 	[Key]
-	public int Id { set; get; }
+	public Guid Id { set; get; }
 
-	[Required]
+	[Required, MinLength(NameMinLength), MaxLength(NameMaxLength)]
 	public string Name { set; get; } = null!;
 
 	[DataType(DataType.Currency), Column(TypeName = "decimal(19,4)")]
@@ -16,5 +17,5 @@ public class MembershipPlan
 
 	public int? Count { set; get; }
 
-	public TimeSpan? Duration { set; get; }
+	public int? Duration { set; get; }
 }

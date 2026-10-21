@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CoachDesk.Data.Migrations
+namespace CoachDesk.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateIdentitySchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,7 @@ namespace CoachDesk.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -96,8 +97,8 @@ namespace CoachDesk.Data.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -141,8 +142,8 @@ namespace CoachDesk.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -152,6 +153,114 @@ namespace CoachDesk.Data.Migrations
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Clients",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Clients_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Coaches",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Coaches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Coaches_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MembershipPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(19,4)", nullable: false),
+                    Count = table.Column<int>(type: "int", nullable: true),
+                    Duration = table.Column<int>(type: "int", nullable: true),
+                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MembershipPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MembershipPlans_Coaches_CoachId",
+                        column: x => x.CoachId,
+                        principalTable: "Coaches",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Duration = table.Column<TimeSpan>(type: "time", nullable: false),
+                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sessions_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Sessions_Coaches_CoachId",
+                        column: x => x.CoachId,
+                        principalTable: "Coaches",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Memberships",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActivatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TimesUsed = table.Column<int>(type: "int", nullable: false),
+                    MembershipPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Memberships", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Memberships_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Memberships_MembershipPlans_MembershipPlanId",
+                        column: x => x.MembershipPlanId,
+                        principalTable: "MembershipPlans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -194,6 +303,41 @@ namespace CoachDesk.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_UserId",
+                table: "Clients",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Coaches_UserId",
+                table: "Coaches",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MembershipPlans_CoachId",
+                table: "MembershipPlans",
+                column: "CoachId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Memberships_ClientId",
+                table: "Memberships",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Memberships_MembershipPlanId",
+                table: "Memberships",
+                column: "MembershipPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_ClientId",
+                table: "Sessions",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_CoachId",
+                table: "Sessions",
+                column: "CoachId");
         }
 
         /// <inheritdoc />
@@ -215,7 +359,22 @@ namespace CoachDesk.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Memberships");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "MembershipPlans");
+
+            migrationBuilder.DropTable(
+                name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "Coaches");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
