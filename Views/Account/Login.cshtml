@@ -7,7 +7,7 @@
 <div class="card border-secondary mb-3" style="margin: 0px 20%">
 	<div class="card-header">Login</div>
 	<div class="card-body">
-		<form asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+		<form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
 			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 			<div class="form-floating mb-3">
 				<input asp-for="Email" class="form-control" type="email" aria-required="true" placeholder=""/>
@@ -26,7 +26,7 @@
 			<input type="submit" class="btn btn-primary" value="Log in"></input>
 		</form>
 		<br/>
-		<p style="text-align: center;">You don&apos;t have an account yet? - <a asp-area="" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]">Register</a></p>
+		<p style="text-align: center;">You don&apos;t have an account yet? - <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]">Register</a></p>
 	</div>
 </div>
 

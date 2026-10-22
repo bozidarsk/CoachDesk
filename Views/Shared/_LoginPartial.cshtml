@@ -8,21 +8,21 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Index">
         	Hello, <span style="text-transform: initial;">@((await UserManager.GetUserAsync(User))!.FullName)</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Logout</a>
     </li>
 }
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
     </li>
 }
 </ul>
