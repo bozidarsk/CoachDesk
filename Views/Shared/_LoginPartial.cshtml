@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http.Extensions
 @using CoachDesk.Data
 
 @inject SignInManager<ApplicationUser> SignInManager
@@ -19,10 +20,10 @@
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Register</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Login</a>
     </li>
 }
 </ul>
