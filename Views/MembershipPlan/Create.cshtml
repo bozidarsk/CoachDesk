@@ -1,0 +1,27 @@
+@model MembershipPlanViewModel
+
+@{
+	ViewData["Title"] = "New Membership Plan";
+}
+
+<div class="row justify-content-center">
+	<div class="col-md-8 col-lg-6">
+		<h1 class="h3 mb-1">New membership plan</h1>
+		<p class="text-muted mb-4">Clients buy a plan from your profile, and each purchase becomes their own membership.</p>
+
+		<form asp-area="" asp-controller="MembershipPlan" asp-action="Create" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+			<partial name="_MembershipPlanFields"/>
+
+			<div class="d-flex gap-2">
+				<input type="submit" class="btn btn-primary" value="Create plan"></input>
+				<a class="btn btn-outline-secondary" asp-area="" asp-controller="Coach" asp-action="Dashboard">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial"/>
+}

@@ -1,0 +1,15 @@
+@model MembershipPlanViewModel
+
+@{
+	ViewData["Title"] = Model.Name;
+}
+
+<div class="row justify-content-center">
+	<div class="col-lg-8">
+		<nav class="mb-3">
+			<a class="text-decoration-none" asp-controller="Coach" asp-action="Dashboard">Back to dashboard</a>
+		</nav>
+
+		<partial name="_MembershipPlanDetails"/>
+	</div>
+</div>

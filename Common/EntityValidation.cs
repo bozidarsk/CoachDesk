@@ -14,4 +14,10 @@ public static class EntityValidation
 
 		public const int FullNameMaxLength = 100;
 	}
+
+	public static class MembershipPlan
+	{
+		public const int NameMinLength = 1;
+		public const int NameMaxLength = 50;
+	}
 }

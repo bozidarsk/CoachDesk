@@ -1,0 +1,33 @@
+@model MembershipPlanViewModel
+
+@{
+	ViewData["Title"] = "Edit Membership Plan";
+}
+
+<div class="row justify-content-center">
+	<div class="col-md-8 col-lg-6">
+		<h1 class="h3 mb-4">Edit membership plan</h1>
+
+		@if (Model.ActiveSubscribers > 0)
+		{
+			<div class="alert alert-warning">
+				@Model.ActiveSubscribers @(Model.ActiveSubscribers == 1 ? "client holds" : "clients hold") this plan. Changes to sessions or duration also apply to memberships that were already purchased.
+			</div>
+		}
+
+		<form asp-controller="MembershipPlan" asp-action="Edit" asp-route-id="@Model.Id" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+			<partial name="_MembershipPlanFields"/>
+
+			<div class="d-flex gap-2">
+				<input type="submit" class="btn btn-primary" value="Save changes"></input>
+				<a class="btn btn-outline-secondary" href="@ViewData["ReturnUrl"]">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial"/>
+}
