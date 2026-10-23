@@ -91,7 +91,7 @@ public class MembershipPlanController : Controller
 		if (model.Count == null && model.Duration == null)
 			ModelState.AddModelError(string.Empty, $"One of '{nameof(model.Count)}' or '{nameof(model.Duration)}' must be specified.");
 
-		if (model.Count < 0)
+		if (model.Count <= 0)
 			ModelState.AddModelError(nameof(model.Count), "Count must be a positive number.");
 
 		if (!ModelState.IsValid)
@@ -174,7 +174,7 @@ public class MembershipPlanController : Controller
 		if (model.Count == null && model.Duration == null)
 			ModelState.AddModelError(string.Empty, $"One of '{nameof(model.Count)}' or '{nameof(model.Duration)}' must be specified.");
 
-		if (model.Count < 0)
+		if (model.Count <= 0)
 			ModelState.AddModelError(nameof(model.Count), "Count must be a positive number.");
 
 		if (!ModelState.IsValid)
