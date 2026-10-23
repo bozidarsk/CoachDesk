@@ -134,7 +134,7 @@ namespace CoachDesk.Migrations
                     b.Property<DateTime>("ActivatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ClientId")
+                    b.Property<Guid>("ClientId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("MembershipPlanId")
@@ -366,15 +366,19 @@ namespace CoachDesk.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Membership", b =>
                 {
-                    b.HasOne("CoachDesk.Data.Models.Client", null)
+                    b.HasOne("CoachDesk.Data.Models.Client", "Client")
                         .WithMany("ActiveMemberships")
-                        .HasForeignKey("ClientId");
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CoachDesk.Data.Models.MembershipPlan", "MembershipPlan")
-                        .WithMany()
+                        .WithMany("ActiveMemberships")
                         .HasForeignKey("MembershipPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Client");
 
                     b.Navigation("MembershipPlan");
                 });
@@ -471,6 +475,11 @@ namespace CoachDesk.Migrations
                     b.Navigation("BookedSessions");
 
                     b.Navigation("MembershipPlans");
+                });
+
+            modelBuilder.Entity("CoachDesk.Data.Models.MembershipPlan", b =>
+                {
+                    b.Navigation("ActiveMemberships");
                 });
 #pragma warning restore 612, 618
         }

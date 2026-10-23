@@ -16,4 +16,8 @@ public class Membership
 	[Required, ForeignKey(nameof(MembershipPlan))]
 	public Guid MembershipPlanId { set; get; }
 	public virtual MembershipPlan MembershipPlan { set; get; } = null!;
+
+	[Required, ForeignKey(nameof(Client))]
+	public Guid ClientId { set; get; }
+	public virtual Client Client { set; get; } = null!;
 }

@@ -24,4 +24,6 @@ public class MembershipPlan
 	public Guid? CoachId { set; get; }
 	[DeleteBehavior(DeleteBehavior.SetNull)]
 	public virtual Coach? Coach { set; get; }
+
+	public virtual ICollection<Membership> ActiveMemberships { set; get; } = [];
 }
