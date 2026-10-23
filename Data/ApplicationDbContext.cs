@@ -11,6 +11,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	public virtual DbSet<Client> Clients { set; get; }
 	public virtual DbSet<Membership> Memberships { set; get; }
 	public virtual DbSet<Session> Sessions { set; get; }
+	public virtual DbSet<WorkPeriod> WorkPeriods { set; get; }
 
 	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
 }

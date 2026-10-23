@@ -12,6 +12,8 @@ public class Coach
 	public string UserId { set; get; } = null!;
 	public virtual ApplicationUser User { set; get; } = null!;
 
+	public virtual ICollection<WorkPeriod> WorkPeriods { set; get; } = [];
+
 	public virtual ICollection<Session> BookedSessions { set; get; } = [];
 
 	public virtual ICollection<MembershipPlan> MembershipPlans { set; get; } = [];

@@ -209,6 +209,31 @@ namespace CoachDesk.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("CoachDesk.Data.Models.WorkPeriod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CoachId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("End")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("Start")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CoachId");
+
+                    b.ToTable("WorkPeriods");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -412,6 +437,17 @@ namespace CoachDesk.Migrations
                     b.Navigation("Coach");
                 });
 
+            modelBuilder.Entity("CoachDesk.Data.Models.WorkPeriod", b =>
+                {
+                    b.HasOne("CoachDesk.Data.Models.Coach", "Coach")
+                        .WithMany("WorkPeriods")
+                        .HasForeignKey("CoachId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coach");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -475,6 +511,8 @@ namespace CoachDesk.Migrations
                     b.Navigation("BookedSessions");
 
                     b.Navigation("MembershipPlans");
+
+                    b.Navigation("WorkPeriods");
                 });
 
             modelBuilder.Entity("CoachDesk.Data.Models.MembershipPlan", b =>
