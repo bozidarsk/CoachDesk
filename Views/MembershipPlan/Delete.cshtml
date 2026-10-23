@@ -8,10 +8,10 @@
 	<div class="col-md-8 col-lg-6">
 		<h1 class="h3 mb-4">Delete membership plan</h1>
 
-		@if (Model.ActiveSubscribers > 0)
+		@if (Model.ActiveClients > 0)
 		{
 			<div class="alert alert-danger">
-				@Model.ActiveSubscribers @(Model.ActiveSubscribers == 1 ? "client holds" : "clients hold") this plan, so it can't be deleted.
+				@Model.ActiveClients @(Model.ActiveClients == 1 ? "client holds" : "clients hold") this plan, so it can't be deleted.
 			</div>
 		}
 		else
@@ -39,7 +39,7 @@
 
 		<form asp-controller="MembershipPlan" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
 			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-			@if (Model.ActiveSubscribers == 0)
+			@if (Model.ActiveClients == 0)
 			{
 				<button type="submit" class="btn btn-danger">Delete plan</button>
 			}

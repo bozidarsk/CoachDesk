@@ -8,10 +8,10 @@
 	<div class="col-md-8 col-lg-6">
 		<h1 class="h3 mb-4">Edit membership plan</h1>
 
-		@if (Model.ActiveSubscribers > 0)
+		@if (Model.ActiveClients > 0)
 		{
 			<div class="alert alert-warning">
-				@Model.ActiveSubscribers @(Model.ActiveSubscribers == 1 ? "client holds" : "clients hold") this plan. Changes to sessions or duration also apply to memberships that were already purchased.
+				@Model.ActiveClients @(Model.ActiveClients == 1 ? "client holds" : "clients hold") this plan. Changes to sessions or duration also apply to memberships that were already purchased.
 			</div>
 		}
 

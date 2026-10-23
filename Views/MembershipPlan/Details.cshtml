@@ -61,10 +61,10 @@
 					<dt class="col-sm-5">Valid for</dt>
 					<dd class="col-sm-7">@(Model.Duration is int days ? days + (days == 1 ? " day" : " days") : "Forever")</dd>
 
-					@if (Model.ActiveSubscribers > 0)
+					@if (Model.ActiveClients > 0)
 					{
 						<dt class="col-sm-5">Clients holding this plan</dt>
-						<dd class="col-sm-7 mb-0">@Model.ActiveSubscribers</dd>
+						<dd class="col-sm-7 mb-0">@Model.ActiveClients</dd>
 					}
 				</dl>
 			</div>

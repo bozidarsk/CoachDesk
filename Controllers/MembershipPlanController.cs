@@ -51,7 +51,7 @@ public class MembershipPlanController : Controller
 				Price = membershipPlan.Price,
 				Count = membershipPlan.Count,
 				Duration = membershipPlan.Duration,
-				ActiveSubscribers = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
+				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
 				OwnerViewing = ownerViewing,
 				ClientViewing = clientViewing,
 			}
@@ -139,7 +139,7 @@ public class MembershipPlanController : Controller
 				Price = membershipPlan.Price,
 				Count = membershipPlan.Count,
 				Duration = membershipPlan.Duration,
-				ActiveSubscribers = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
+				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
 				OwnerViewing = true,
 				ClientViewing = false,
 			}
@@ -213,7 +213,7 @@ public class MembershipPlanController : Controller
 				Price = membershipPlan.Price,
 				Count = membershipPlan.Count,
 				Duration = membershipPlan.Duration,
-				ActiveSubscribers = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
+				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
 				OwnerViewing = true,
 				ClientViewing = false,
 			}
@@ -239,9 +239,9 @@ public class MembershipPlanController : Controller
 			return View(model);
 		}
 
-		var activeSubscribers = await dbContext.Memberships.Where(x => x.MembershipPlanId == model.Id).CountAsync();
+		var activeClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == model.Id).CountAsync();
 
-		if (activeSubscribers > 0)
+		if (activeClients > 0)
 		{
 			ModelState.AddModelError(string.Empty, "There are clients that hold this plan, so it cannot be deleted.");
 

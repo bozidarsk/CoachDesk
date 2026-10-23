@@ -18,7 +18,7 @@ public class MembershipPlanViewModel
 	public int? Duration { set; get; }
 
 	public Guid Id { set; get; }
-	public int ActiveSubscribers { set; get; }
+	public int ActiveClients { set; get; }
 	public bool OwnerViewing { set; get; }
 	public bool ClientViewing { set; get; }
 }
