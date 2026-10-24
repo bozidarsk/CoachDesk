@@ -34,7 +34,7 @@
 			@if (Model.OwnerViewing)
 			{
 				<div class="d-grid gap-2">
-					<a class="btn btn-primary" asp-action="Dashboard">Open dashboard</a>
+					<a class="btn btn-primary" asp-controller="Coach" asp-action="Dashboard">Open dashboard</a>
 					<a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Index">Manage my account</a>
 				</div>
 			}
@@ -48,7 +48,7 @@
 	<h2 class="h4 mb-0 me-auto">Membership plans</h2>
 	@if (Model.OwnerViewing)
 	{
-		<a class="btn btn-sm btn-outline-secondary" asp-action="Dashboard">Manage plans</a>
+		<a class="btn btn-sm btn-outline-secondary" asp-controller="Coach" asp-action="Dashboard">Manage plans</a>
 	}
 </div>
 
