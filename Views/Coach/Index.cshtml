@@ -80,7 +80,11 @@ else
 							<li>@plan.Count sessions included</li>
 							<li>Valid for @(plan.Duration ?? 0) days</li>
 						</ul>
-						@if (Model.ClientViewing)
+						@if (Model.OwnerViewing)
+						{
+							<a class="btn btn-outline-primary w-100" asp-controller="MembershipPlan" asp-action="Details" asp-route-id="@plan.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Details</a>
+						}
+						else if (Model.ClientViewing)
 						{
 							<form asp-controller="Membership" asp-action="Purchase" asp-route-membershipPlanId="@plan.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
 								<button class="btn btn-primary w-100" type="submit">Purchase plan</button>
