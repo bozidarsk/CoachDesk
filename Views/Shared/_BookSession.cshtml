@@ -1,5 +1,6 @@
 @model CoachIndexViewModel
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Http.Extensions
 @using static CoachDesk.Common.ApplicationConstants;
 
 @attribute [Authorize(Roles = ClientRole)]
@@ -34,9 +35,9 @@
 <div class="card h-100">
 	<div class="card-header fw-bold">Book a session</div>
 	<div class="card-body">
-		@if (TempData["SessionError"] is string sessionError)
+		@if (TempData["SessionBookError"] is string sessionBookError)
 		{
-			<div class="alert alert-danger">@sessionError</div>
+			<div class="alert alert-danger">@sessionBookError</div>
 		}
 
 		@if (!(bool)Model.ViewingClientHasMembership!)
@@ -73,7 +74,7 @@
 
 			<div id="bk-slots"></div>
 
-			<form class="mt-3" asp-controller="Session" asp-action="Book" method="post">
+			<form class="mt-3" asp-controller="Session" asp-action="Book" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
 				<input type="hidden" name="CoachId" value="@Model.Id"/>
 				<input type="hidden" name="ClientId" value="@Model.ViewingClientId"/>
 				<input type="hidden" name="Date" id="bk-scheduled-at"/>

@@ -1,31 +1,47 @@
 @model IEnumerable<SessionViewModel>
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Identity
+@using CoachDesk.Data
+@using static CoachDesk.Common.ApplicationConstants
+
+@attribute [Authorize]
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+	var user = (await UserManager.GetUserAsync(User))!;
+}
 
 <ul class="list-group list-group-flush">
+	@if (TempData["SessionCancelError"] is string sessionCancelError)
+	{
+		<li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+			<span class="text-danger">@sessionCancelError</span>
+		</li>
+	}
+
 	@foreach (var session in Model)
 	{
-		@*
-		var badge = session.Status switch
-		{
-			"Completed" => "bg-success",
-			"Cancelled" => "bg-secondary",
-			_ => "bg-primary"
-		};
-		*@
-
 		<li class="list-group-item d-flex flex-wrap align-items-center gap-2">
 			<div class="me-auto">
 				<div class="fw-bold">@session.Date.ToString("ddd, dd MMM yyyy")</div>
 				<div class="text-muted small">
-					@session.Date.ToString("HH:mm") with @session.CoachFullName
+					@if (await UserManager.IsInRoleAsync(user, CoachRole))
+					{
+						<span>@session.Date.ToString("HH:mm") with @session.ClientFullName</span>
+					}
+					else if (await UserManager.IsInRoleAsync(user, ClientRole))
+					{
+						<span>@session.Date.ToString("HH:mm") with @session.CoachFullName</span>
+					}
 				</div>
 			</div>
-			<!--@* <span class="badge @badge">@session.Status</span> *@-->
 			@if (session.CanCancel)
 			{
-				<form asp-controller="SessionController" asp-action="Cancel" asp-route-id="@session.Id" method="post" onsubmit="return confirm('Cancel this session?');">
+				<form asp-controller="Session" asp-action="Cancel" asp-route-id="@session.Id" method="post" onsubmit="return confirm('Cancel this session?');">
 					<input type="hidden" name="returnUrl" value="@Context.Request.GetEncodedPathAndQuery()"/>
-					<button type="submit" class="btn btn-sm btn-outline-danger">Cancel session</button>
+					<button class="btn btn-sm btn-outline-danger" type="submit">Cancel session</button>
 				</form>
 			}
 		</li>
