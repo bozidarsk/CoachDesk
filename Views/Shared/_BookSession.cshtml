@@ -39,7 +39,11 @@
 			<div class="alert alert-danger">@sessionError</div>
 		}
 
-		@if (!Model.WorkPeriods.Any())
+		@if (!(bool)Model.ViewingClientHasMembership!)
+		{
+			<p class="text-muted mb-0">You don't have an active membership from this coach. Purchase one first.</p>
+		}
+		else if (!Model.WorkPeriods.Any())
 		{
 			<p class="text-muted mb-0">This coach hasn't set any free hours yet. Check back soon.</p>
 		}

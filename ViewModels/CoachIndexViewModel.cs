@@ -16,6 +16,7 @@ public class CoachIndexViewModel
 	public bool ClientViewing { set; get; }
 
 	public Guid? ViewingClientId { set; get; }
+	public bool? ViewingClientHasMembership { set; get; }
 	public IReadOnlyList<SessionViewModel>? ViewingClientUpcomingSessions { set; get; }
 
 	public IReadOnlyList<SessionViewModel> UpcomingSessions { set; get; } = null!;

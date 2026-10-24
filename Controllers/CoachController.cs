@@ -71,6 +71,7 @@ public class CoachController : Controller
 				UpcomingSessions = await GetAllUpcomingSessions(coachId: coach.Id, clientId: null),
 				WorkPeriods = await GetAllWorkPeriods(coach.Id),
 				ViewingClientId = clientId,
+				ViewingClientHasMembership = (clientId != null) ? await dbContext.MembershipPlans.AnyAsync(x => x.CoachId == coach.Id && x.ActiveMemberships.Any(x => x.ClientId == clientId)) : null,
 				ViewingClientUpcomingSessions = clientViewing ? await GetAllUpcomingSessions(coachId: coach.Id, clientId: clientId) : null,
 			}
 		);
