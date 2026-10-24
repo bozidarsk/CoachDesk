@@ -69,7 +69,12 @@ else
 			<div class="col-md-6 col-lg-4">
 				<div class="card h-100">
 					<div class="card-body d-flex flex-column">
-						<h3 class="h5">@plan.Name</h3>
+						<h3 class="h5">@plan.Name
+							@if (plan.Active)
+							{
+								<span class="badge rounded-pill bg-success text-dark border">Active</span>
+							}
+						</h3>
 						<div class="h4 mb-3">@plan.Price.ToString("C")</div>
 						<ul class="list-unstyled text-muted flex-grow-1">
 							<li>@plan.Count sessions included</li>

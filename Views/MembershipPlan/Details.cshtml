@@ -34,7 +34,12 @@
 
 		<div class="d-flex flex-wrap align-items-start gap-2 mb-4">
 			<div class="me-auto">
-				<h1 class="h3 mb-1">@Model.Name</h1>
+				<h1 class="h3 mb-1">@Model.Name
+					@if (Model.Active)
+					{
+						<span class="badge rounded-pill bg-success text-dark border">Active</span>
+					}
+				</h1>
 				<div class="text-muted">@sessionsText, @validityText</div>
 			</div>
 

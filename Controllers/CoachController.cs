@@ -66,7 +66,7 @@ public class CoachController : Controller
 				Bio = coach.User.Bio,
 				MemberSince = coach.User.MemberSince,
 				Initials = $"{initials[0]}{initials[^1]}",
-				MembershipPlans = await GetAllMembershipPlans(coach.Id),
+				MembershipPlans = await GetAllMembershipPlans(coachId: coach.Id, clientId: clientId),
 				ActiveClients = (await GetAllActiveClients(coach.Id)).Count,
 				UpcomingSessions = await GetAllUpcomingSessions(coachId: coach.Id, clientId: null),
 				WorkPeriods = await GetAllWorkPeriods(coach.Id),
@@ -91,7 +91,7 @@ public class CoachController : Controller
 				FullName = user.FullName,
 				WeeklyHours = workPeriods.Sum(x => x.Duration.TotalHours),
 				Clients = await GetAllActiveClients(coach.Id),
-				MembershipPlans = await GetAllMembershipPlans(coach.Id),
+				MembershipPlans = await GetAllMembershipPlans(coach.Id, null),
 				UpcomingSessions = await GetAllUpcomingSessions(coachId: coach.Id, clientId: null),
 				WorkPeriods = workPeriods,
 			}
@@ -115,7 +115,7 @@ public class CoachController : Controller
 		.ToListAsync()
 	;
 
-	private async Task<IReadOnlyList<MembershipPlanViewModel>> GetAllMembershipPlans(Guid coachId) => await dbContext.MembershipPlans
+	private async Task<IReadOnlyList<MembershipPlanViewModel>> GetAllMembershipPlans(Guid coachId, Guid? clientId) => await dbContext.MembershipPlans
 		.Where(x => x.CoachId == coachId)
 		.Select(x =>
 			new MembershipPlanViewModel()
@@ -126,8 +126,7 @@ public class CoachController : Controller
 				Duration = x.Duration,
 				Count = x.Count,
 				ActiveClients = x.ActiveMemberships.Count,
-				OwnerViewing = true,
-				ClientViewing = false,
+				Active = (clientId != null) ? x.ActiveMemberships.Any(x => x.ClientId == clientId) : false,
 			}
 		)
 		.ToListAsync()

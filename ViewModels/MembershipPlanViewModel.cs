@@ -21,4 +21,5 @@ public class MembershipPlanViewModel
 	public int ActiveClients { set; get; }
 	public bool OwnerViewing { set; get; }
 	public bool ClientViewing { set; get; }
+	public bool Active { set; get; }
 }

@@ -26,6 +26,7 @@ public class MembershipPlanController : Controller
 
 		bool ownerViewing = false;
 		bool clientViewing = false;
+		Guid? clientId = null;
 
 		if (signInManager.IsSignedIn(User))
 		{
@@ -39,7 +40,10 @@ public class MembershipPlanController : Controller
 			}
 			else if (await userManager.IsInRoleAsync(user, ClientRole))
 			{
+				var client = await dbContext.Clients.SingleAsync(x => x.UserId == user.Id);
+
 				clientViewing = true;
+				clientId = client.Id;
 			}
 		}
 
@@ -54,6 +58,7 @@ public class MembershipPlanController : Controller
 				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
 				OwnerViewing = ownerViewing,
 				ClientViewing = clientViewing,
+				Active = await dbContext.Memberships.AnyAsync(x => x.MembershipPlanId == membershipPlan.Id && x.ClientId == clientId),
 			}
 		);
 	}
