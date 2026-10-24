@@ -33,8 +33,9 @@ public class MembershipController : Controller
 		var client = await dbContext.Clients.SingleAsync(x => x.UserId == user.Id);
 
 		if (await dbContext.Memberships.AnyAsync(x =>
-				x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId &&
-				!((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) < DateTime.UtcNow : false)
+				x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId
+				&& !((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) <= DateTime.UtcNow : false)
+				&& !((x.MembershipPlan.Count != null) ? x.TimesUsed >= x.MembershipPlan.Count : false)
 			)
 		)
 		{
@@ -43,20 +44,16 @@ public class MembershipController : Controller
 			return LocalRedirect(returnUrl);
 		}
 
-		if (await dbContext.Memberships.AnyAsync(x =>
-				x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId &&
-				((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) < DateTime.UtcNow : false)
-			)
-		)
-		{
-			await dbContext.Memberships
-				.Where(x =>
-					x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId &&
-					((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) < DateTime.UtcNow : false)
+		await dbContext.Memberships
+			.Where(x =>
+				x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId
+				&& (
+					((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) <= DateTime.UtcNow : false)
+					|| ((x.MembershipPlan.Count != null) ? x.TimesUsed >= x.MembershipPlan.Count : false)
 				)
-				.ExecuteDeleteAsync()
-			;
-		}
+			)
+			.ExecuteDeleteAsync()
+		;
 
 		await dbContext.Memberships.AddAsync(
 			new()

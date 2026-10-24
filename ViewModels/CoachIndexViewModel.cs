@@ -1,3 +1,5 @@
+using CoachDesk.ViewModels.Enums;
+
 namespace CoachDesk.ViewModels;
 
 public class CoachIndexViewModel
@@ -16,7 +18,7 @@ public class CoachIndexViewModel
 	public bool ClientViewing { set; get; }
 
 	public Guid? ViewingClientId { set; get; }
-	public bool? ViewingClientHasMembership { set; get; }
+	public MembershipStatus? ViewingClientMembershipStatus { set; get; }
 	public IReadOnlyList<SessionViewModel>? ViewingClientUpcomingSessions { set; get; }
 
 	public IReadOnlyList<SessionViewModel> UpcomingSessions { set; get; } = null!;

@@ -1,4 +1,5 @@
 @model MembershipPlanViewModel
+@using CoachDesk.ViewModels.Enums
 @using Microsoft.AspNetCore.Http.Extensions
 
 @{
@@ -35,9 +36,16 @@
 		<div class="d-flex flex-wrap align-items-start gap-2 mb-4">
 			<div class="me-auto">
 				<h1 class="h3 mb-1">@Model.Name
-					@if (Model.Active)
+					@if (Model.MembershipStatus != MembershipStatus.Unknown)
 					{
-						<span class="badge rounded-pill bg-success text-dark border">Active</span>
+						var css = Model.MembershipStatus switch
+						{
+							MembershipStatus.Active => "bg-success",
+							MembershipStatus.Expired or MembershipStatus.OutOfSessions => "bg-light",
+							_ => "",
+						};
+
+						<span class="badge rounded-pill @css text-dark border">@Model.MembershipStatus.ToString()</span>
 					}
 				</h1>
 				<div class="text-muted">@sessionsText, @validityText</div>

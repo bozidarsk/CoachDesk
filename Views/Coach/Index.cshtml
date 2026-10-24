@@ -1,5 +1,6 @@
 @model CoachIndexViewModel
 @using Microsoft.AspNetCore.Http.Extensions
+@using CoachDesk.ViewModels.Enums
 
 @{
 	ViewData["Title"] = Model.FullName;
@@ -70,9 +71,16 @@ else
 				<div class="card h-100">
 					<div class="card-body d-flex flex-column">
 						<h3 class="h5">@plan.Name
-							@if (plan.Active)
+							@if (plan.MembershipStatus != MembershipStatus.Unknown)
 							{
-								<span class="badge rounded-pill bg-success text-dark border">Active</span>
+								var css = plan.MembershipStatus switch
+								{
+									MembershipStatus.Active => "bg-success",
+									MembershipStatus.Expired or MembershipStatus.OutOfSessions => "bg-light",
+									_ => "",
+								};
+
+								<span class="badge rounded-pill @css text-dark border">@plan.MembershipStatus.ToString()</span>
 							}
 						</h3>
 						<div class="h4 mb-3">@plan.Price.ToString("C")</div>

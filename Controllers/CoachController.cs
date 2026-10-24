@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.ViewModels;
+using CoachDesk.ViewModels.Enums;
 using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;
@@ -71,7 +73,7 @@ public class CoachController : Controller
 				UpcomingSessions = await GetAllUpcomingSessions(coachId: coach.Id, clientId: null),
 				WorkPeriods = await GetAllWorkPeriods(coach.Id),
 				ViewingClientId = clientId,
-				ViewingClientHasMembership = (clientId != null) ? await dbContext.MembershipPlans.AnyAsync(x => x.CoachId == coach.Id && x.ActiveMemberships.Any(x => x.ClientId == clientId)) : null,
+				ViewingClientMembershipStatus = (clientId != null) ? GetMembershipStatus(await dbContext.Memberships.Include(x => x.MembershipPlan).SingleOrDefaultAsync(x => x.ClientId == clientId && x.MembershipPlan.CoachId == coach.Id)) : null,
 				ViewingClientUpcomingSessions = clientViewing ? await GetAllUpcomingSessions(coachId: coach.Id, clientId: clientId) : null,
 			}
 		);
@@ -115,22 +117,32 @@ public class CoachController : Controller
 		.ToListAsync()
 	;
 
-	private async Task<IReadOnlyList<MembershipPlanViewModel>> GetAllMembershipPlans(Guid coachId, Guid? clientId) => await dbContext.MembershipPlans
-		.Where(x => x.CoachId == coachId)
-		.Select(x =>
-			new MembershipPlanViewModel()
-			{
-				Id = x.Id,
-				Name = x.Name,
-				Price = x.Price,
-				Duration = x.Duration,
-				Count = x.Count,
-				ActiveClients = x.ActiveMemberships.Count,
-				Active = (clientId != null) ? x.ActiveMemberships.Any(x => x.ClientId == clientId) : false,
-			}
-		)
-		.ToListAsync()
-	;
+	private async Task<IReadOnlyList<MembershipPlanViewModel>> GetAllMembershipPlans(Guid coachId, Guid? clientId)
+	{
+		var result = await dbContext.MembershipPlans
+			.Where(x => x.CoachId == coachId)
+			.Select(x =>
+				new MembershipPlanViewModel()
+				{
+					Id = x.Id,
+					Name = x.Name,
+					Price = x.Price,
+					Duration = x.Duration,
+					Count = x.Count,
+					ActiveClients = x.ActiveMemberships.Count,
+				}
+			)
+			.ToListAsync()
+		;
+
+		for (int i = 0; i < result.Count; i++)
+			result[i].MembershipStatus = (clientId != null)
+				? GetMembershipStatus(await dbContext.Memberships.Include(x => x.MembershipPlan).SingleOrDefaultAsync(x => x.MembershipPlanId == result[i].Id && x.ClientId == clientId && x.MembershipPlan.CoachId == coachId))
+				: MembershipStatus.Unknown
+			;
+
+		return result;
+	}
 
 	private async Task<IReadOnlyList<SessionViewModel>> GetAllUpcomingSessions(Guid coachId, Guid? clientId) => await dbContext.Sessions
 		.Where(x => ((clientId == null) ? x.CoachId == coachId : x.CoachId == coachId && x.ClientId == clientId) && x.Date >= DateTime.UtcNow)
@@ -161,6 +173,20 @@ public class CoachController : Controller
 		)
 		.ToListAsync()
 	;
+
+	private static MembershipStatus GetMembershipStatus(Membership? membership)
+	{
+		if (membership == null)
+			return MembershipStatus.Unknown;
+
+		if ((membership.MembershipPlan.Duration != null) ? membership.ActivatedOn.AddDays((int)membership.MembershipPlan.Duration) <= DateTime.UtcNow : false)
+			return MembershipStatus.Expired;
+
+		if ((membership.MembershipPlan.Count != null) ? membership.TimesUsed >= membership.MembershipPlan.Count : false)
+			return MembershipStatus.OutOfSessions;
+
+		return MembershipStatus.Active;
+	}
 
 	public CoachController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
 	{

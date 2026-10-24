@@ -1,6 +1,7 @@
 @model CoachIndexViewModel
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Http.Extensions
+@using CoachDesk.ViewModels.Enums
 @using static CoachDesk.Common.ApplicationConstants;
 
 @attribute [Authorize(Roles = ClientRole)]
@@ -40,7 +41,7 @@
 			<div class="alert alert-danger">@sessionBookError</div>
 		}
 
-		@if (!(bool)Model.ViewingClientHasMembership!)
+		@if (Model.ViewingClientMembershipStatus != MembershipStatus.Active)
 		{
 			<p class="text-muted mb-0">You don't have an active membership from this coach. Purchase one first.</p>
 		}

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.ViewModels;
+using CoachDesk.ViewModels.Enums;
 using static CoachDesk.Common.ApplicationConstants;
 using static CoachDesk.Common.EntityValidation.MembershipPlan;
 
@@ -58,9 +60,23 @@ public class MembershipPlanController : Controller
 				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
 				OwnerViewing = ownerViewing,
 				ClientViewing = clientViewing,
-				Active = await dbContext.Memberships.AnyAsync(x => x.MembershipPlanId == membershipPlan.Id && x.ClientId == clientId),
+				MembershipStatus = GetMembershipStatus(await dbContext.Memberships.Include(x => x.MembershipPlan).SingleOrDefaultAsync(x => x.MembershipPlanId == membershipPlan.Id && x.ClientId == clientId)),
 			}
 		);
+	}
+
+	private static MembershipStatus GetMembershipStatus(Membership? membership)
+	{
+		if (membership == null)
+			return MembershipStatus.Unknown;
+
+		if ((membership.MembershipPlan.Duration != null) ? membership.ActivatedOn.AddDays((int)membership.MembershipPlan.Duration) <= DateTime.UtcNow : false)
+			return MembershipStatus.Expired;
+
+		if ((membership.MembershipPlan.Count != null) ? membership.TimesUsed >= membership.MembershipPlan.Count : false)
+			return MembershipStatus.OutOfSessions;
+
+		return MembershipStatus.Active;
 	}
 
 	[HttpGet]
