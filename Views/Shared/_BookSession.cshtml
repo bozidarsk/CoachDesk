@@ -1,0 +1,308 @@
+@model CoachIndexViewModel
+@using Microsoft.AspNetCore.Authorization
+@using static CoachDesk.Common.ApplicationConstants;
+
+@attribute [Authorize(Roles = ClientRole)]
+
+@{
+	var bookingSessionMinutes = 60;
+	var bookingStepMinutes = 30;
+	var bookingHorizonDays = 60;
+
+	var bookingWorkPeriods = Json.Serialize(
+		Model.WorkPeriods.Select(x =>
+			new
+			{
+				day = (int)x.DayOfWeek,
+				start = x.Start.ToString("HH:mm"),
+				end = x.End.ToString("HH:mm"),
+			}
+		)
+	);
+
+	var bookingBooked = Json.Serialize(
+		Model.UpcomingSessions.Select(x =>
+			new
+			{
+				start = x.Date,
+				minutes = (int)x.Duration.TotalMinutes,
+			}
+		)
+	);
+}
+
+<div class="card h-100">
+	<div class="card-header fw-bold">Book a session</div>
+	<div class="card-body">
+		@if (TempData["SessionError"] is string sessionError)
+		{
+			<div class="alert alert-danger">@sessionError</div>
+		}
+
+		@if (!Model.WorkPeriods.Any())
+		{
+			<p class="text-muted mb-0">This coach hasn't set any free hours yet. Check back soon.</p>
+		}
+		else
+		{
+			<div class="d-flex align-items-center mb-2">
+				<button class="btn btn-sm btn-outline-secondary" type="button" id="bk-prev">Previous</button>
+				<div class="fw-bold mx-auto" id="bk-title"></div>
+				<button class="btn btn-sm btn-outline-secondary" type="button" id="bk-next">Next</button>
+			</div>
+
+			<div class="d-grid text-center small text-muted mb-1" style="grid-template-columns: repeat(7,1fr)">
+				<div>Mon</div>
+				<div>Tue</div>
+				<div>Wed</div>
+				<div>Thu</div>
+				<div>Fri</div>
+				<div>Sat</div>
+				<div>Sun</div>
+			</div>
+
+			<div class="d-grid gap-1" id="bk-grid" style="grid-template-columns: repeat(7,1fr)"></div>
+
+			<div class="small text-muted mt-2">Highlighted days have free times.</div>
+
+			<hr/>
+
+			<div id="bk-slots"></div>
+
+			<form class="mt-3" asp-controller="Session" asp-action="Book" method="post">
+				<input type="hidden" name="CoachId" value="@Model.Id"/>
+				<input type="hidden" name="ClientId" value="@Model.ViewingClientId"/>
+				<input type="hidden" name="Date" id="bk-scheduled-at"/>
+				<input type="hidden" name="Duration" value="@TimeSpan.FromMinutes(bookingSessionMinutes)"/>
+				<div class="small text-muted mb-2" id="bk-summary">Pick a day and a time.</div>
+				<button class="btn btn-primary w-100" type="submit" id="bk-submit" disabled>Book session</button>
+			</form>
+
+			<script>
+				const WORK = @bookingWorkPeriods;
+				const BOOKED_RAW = @bookingBooked;
+				const SESSION = @bookingSessionMinutes;
+				const STEP = @bookingStepMinutes;
+				const HORIZON = @bookingHorizonDays;
+
+				const utc = (y, m, d, hh, mm) => Date.UTC(y, m, d, hh, mm) / 60000;
+				const toMinutes = hhmm => { const parts = hhmm.split(':'); return Number(parts[0]) * 60 + Number(parts[1]); };
+				const pad = x => String(x).padStart(2, '0');
+				const clock = minutes => pad(Math.floor(minutes / 60) % 24) + ':' + pad(minutes % 60);
+				const longDate = date => date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+
+				const BOOKED = BOOKED_RAW.map(x =>
+					{
+						const matches = x.start.match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+)/);
+						const start = utc(Number(matches[1]), Number(matches[2]) - 1, Number(matches[3]), Number(matches[4]), Number(matches[5]));
+						return { start: start, end: start + x.minutes };
+					}
+				);
+
+				const now = new Date();
+				const NOW = utc(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+				const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+				const lastDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + HORIZON);
+
+				function freeSlots(date)
+				{
+					const base = utc(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0);
+					const found = new Set();
+
+					for (const period of WORK)
+					{
+						if (period.day !== date.getDay())
+							continue;
+
+						for (let time = toMinutes(period.start); time + SESSION <= toMinutes(period.end); time += STEP)
+						{
+							const start = base + time;
+							const end = start + SESSION;
+
+							if (start <= NOW)
+								continue; // already started
+
+							if (BOOKED.some(b => start < b.end && end > b.start))
+								continue; // overlaps a booked session
+
+							found.add(time);
+						}
+					}
+
+					return Array.from(found).sort((a, b) => a - b);
+				}
+
+				const grid = document.getElementById('bk-grid');
+				const title = document.getElementById('bk-title');
+				const prev = document.getElementById('bk-prev');
+				const next = document.getElementById('bk-next');
+				const slotsBox = document.getElementById('bk-slots');
+				const scheduledAt = document.getElementById('bk-scheduled-at');
+				const summary = document.getElementById('bk-summary');
+				const submit = document.getElementById('bk-submit');
+
+				let month = new Date(today.getFullYear(), today.getMonth(), 1);
+				let selectedDay = null;
+				let selectedMinutes = null;
+
+				for (let day = new Date(today); day <= lastDay; day.setDate(day.getDate() + 1))
+				{
+					if (freeSlots(day).length > 0)
+					{
+						selectedDay = new Date(day);
+						month = new Date(day.getFullYear(), day.getMonth(), 1);
+						break;
+					}
+				}
+
+				function renderCalendar()
+				{
+					title.textContent = month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+					prev.disabled = month <= new Date(today.getFullYear(), today.getMonth(), 1);
+					next.disabled = new Date(month.getFullYear(), month.getMonth() + 1, 1) > lastDay;
+					grid.innerHTML = '';
+
+					const offset = (month.getDay() + 6) % 7; // week starts on monday
+
+					for (let i = 0; i < offset; i++)
+						grid.appendChild(document.createElement('div'));
+
+					const count = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+
+					for (let day = 1; day <= count; day++)
+					{
+						const date = new Date(month.getFullYear(), month.getMonth(), day);
+						const free = date >= today && date <= lastDay && freeSlots(date).length > 0;
+						const selected = selectedDay !== null && date.getTime() === selectedDay.getTime();
+
+						const button = document.createElement('button');
+						button.type = 'button';
+						button.textContent = day;
+						button.disabled = !free;
+						button.className = 'btn btn-sm ' + (selected ? 'btn-primary' : free ? 'btn-outline-primary' : 'btn-light text-muted');
+
+						if (date.getTime() === today.getTime())
+							button.classList.add('fw-bold');
+
+						button.setAttribute('aria-label', longDate(date));
+
+						if (free)
+						{
+							button.addEventListener('click', () =>
+								{
+									selectedDay = date;
+									selectedMinutes = null;
+									renderCalendar();
+									renderSlots();
+								}
+							);
+						}
+
+						grid.appendChild(button);
+					}
+				}
+
+				function renderSlots()
+				{
+					slotsBox.innerHTML = '';
+
+					if (selectedDay === null)
+					{
+						const none = document.createElement('p');
+						none.className = 'text-muted mb-0';
+						none.textContent = 'This coach has no free times in the next ' + HORIZON + ' days. Check back soon.';
+
+						slotsBox.appendChild(none);
+						updateForm();
+
+						return;
+					}
+
+					const heading = document.createElement('div');
+					heading.className = 'fw-bold mb-2';
+					heading.textContent = longDate(selectedDay);
+
+					slotsBox.appendChild(heading);
+
+					const slots = freeSlots(selectedDay);
+
+					if (slots.length === 0)
+					{
+						const gone = document.createElement('p');
+						gone.className = 'text-muted mb-0';
+						gone.textContent = 'No free times left on this day.';
+
+						slotsBox.appendChild(gone);
+					}
+
+					const groups =
+					[
+						{ name: 'Morning', from: 0, to: 12 * 60 },
+						{ name: 'Afternoon', from: 12 * 60, to: 18 * 60 },
+						{ name: 'Evening', from: 18 * 60, to: 24 * 60 },
+					];
+
+					for (const group of groups)
+					{
+						const inGroup = slots.filter(x => x >= group.from && x < group.to);
+
+						if (inGroup.length === 0)
+							continue;
+
+						const label = document.createElement('div');
+						label.className = 'small text-muted mb-1';
+						label.textContent = group.name;
+
+						const row = document.createElement('div');
+						row.className = 'd-flex flex-wrap gap-2 mb-3';
+
+						for (const time of inGroup)
+						{
+							const button = document.createElement('button');
+							button.type = 'button';
+							button.className = 'btn btn-sm ' + (time === selectedMinutes ? 'btn-primary' : 'btn-outline-primary');
+							button.textContent = clock(time);
+							button.setAttribute('aria-pressed', String(time === selectedMinutes));
+							button.addEventListener('click', () => { selectedMinutes = time; renderSlots(); });
+
+							row.appendChild(button);
+						}
+
+						slotsBox.appendChild(label);
+						slotsBox.appendChild(row);
+					}
+
+					updateForm();
+				}
+
+				function updateForm()
+				{
+					const ready = selectedDay !== null && selectedMinutes !== null;
+
+					submit.disabled = !ready;
+
+					if (!ready)
+					{
+						scheduledAt.value = '';
+						summary.textContent = 'Pick a day and a time.';
+						return;
+					}
+
+					scheduledAt.value =
+						selectedDay.getFullYear() + '-' + pad(selectedDay.getMonth() + 1) + '-' + pad(selectedDay.getDate()) + 'T' + clock(selectedMinutes) + ':00'
+					;
+
+					summary.textContent =
+						longDate(selectedDay) + ', ' + clock(selectedMinutes) + ' to ' + clock(selectedMinutes + SESSION) + ' (' + SESSION + ' minutes)'
+					;
+				}
+
+				prev.addEventListener('click', () => { month = new Date(month.getFullYear(), month.getMonth() - 1, 1); renderCalendar(); });
+				next.addEventListener('click', () => { month = new Date(month.getFullYear(), month.getMonth() + 1, 1); renderCalendar(); });
+
+				renderCalendar();
+				renderSlots();
+			</script>
+		}
+	</div>
+</div>

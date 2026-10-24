@@ -1,0 +1,132 @@
+@model CoachIndexViewModel
+@using Microsoft.AspNetCore.Http.Extensions
+
+@{
+	ViewData["Title"] = Model.FullName;
+
+	var specialities = new string[] { "Test", "test" }; // TODO
+
+	var stats = new[]
+	{
+		("Current clients", Model.ActiveClients.ToString()),
+		("Membership plans", Model.MembershipPlans.Count.ToString()),
+	};
+}
+
+<div class="card shadow-sm mb-4">
+	<div class="card-body p-4">
+		<div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+			<div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width:80px;height:80px;font-size:1.75rem">@Model.Initials</div>
+
+			<div class="flex-grow-1">
+				<h1 class="h3 mb-1">@Model.FullName</h1>
+				<div class="text-muted mb-2">Coach, member since @Model.MemberSince.ToString("MMMM yyyy")</div>
+				@foreach (var specialty in specialities)
+				{
+					<span class="badge rounded-pill bg-light text-dark border me-1">@specialty</span>
+				}
+				@if (!string.IsNullOrWhiteSpace(Model.Bio))
+				{
+					<p class="mt-3 mb-0">@Model.Bio</p>
+				}
+			</div>
+
+			@if (Model.OwnerViewing)
+			{
+				<div class="d-grid gap-2">
+					<a class="btn btn-primary" asp-action="Dashboard">Open dashboard</a>
+					<a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Index">Manage my account</a>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+<partial name="_StatRow" model="stats"/>
+
+<div class="d-flex align-items-center mb-2">
+	<h2 class="h4 mb-0 me-auto">Membership plans</h2>
+	@if (Model.OwnerViewing)
+	{
+		<a class="btn btn-sm btn-outline-secondary" asp-action="Dashboard">Manage plans</a>
+	}
+</div>
+
+@if (Model.ClientViewing && !Model.ClientViewing && Model.MembershipPlans.Any())
+{
+	<p class="text-muted">Purchase a plan to become this coach's client and start booking sessions.</p>
+}
+
+@if (!Model.MembershipPlans.Any())
+{
+	<div class="alert alert-light border">This coach hasn't published any membership plans yet.</div>
+}
+else
+{
+	<div class="row g-3 mb-4">
+		@foreach (var plan in Model.MembershipPlans)
+		{
+			<div class="col-md-6 col-lg-4">
+				<div class="card h-100">
+					<div class="card-body d-flex flex-column">
+						<h3 class="h5">@plan.Name</h3>
+						<div class="h4 mb-3">@plan.Price.ToString("C")</div>
+						<ul class="list-unstyled text-muted flex-grow-1">
+							<li>@plan.Count sessions included</li>
+							<li>Valid for @(plan.Duration ?? 0) days</li>
+						</ul>
+						@if (Model.ClientViewing)
+						{
+							<form asp-controller="Membership" asp-action="Purchase" asp-route-planId="@plan.Id" method="post">
+								<button type="submit" class="btn btn-primary w-100">Purchase plan</button>
+							</form>
+						}
+						else if (!Model.IsLoggedIn)
+						{
+							<a class="btn btn-outline-primary w-100" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Log in to purchase</a>
+						}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+}
+
+<div class="row g-4">
+	@if (Model.OwnerViewing)
+	{
+		<div>
+			<div class="card h-100">
+				<div class="card-header fw-bold">Your upcoming sessions</div>
+				@if (!Model.UpcomingSessions.Any())
+				{
+					<div class="card-body text-muted">No sessions booked with you yet.</div>
+				}
+				else
+				{
+					<partial name="_SessionList" model="Model.UpcomingSessions"/>
+				}
+			</div>
+		</div>
+	}
+	else if (Model.ClientViewing)
+	{
+		<div class="col-lg-6">
+			<div class="card h-100">
+				<div class="card-header fw-bold">Your upcoming sessions</div>
+				@if (!Model.ViewingClientUpcomingSessions!.Any())
+				{
+					<div class="card-body text-muted">No sessions booked with this coach yet. Pick a time under Book a session.</div>
+				}
+				else
+				{
+					<partial name="_SessionList" model="Model.ViewingClientUpcomingSessions"/>
+				}
+			</div>
+		</div>
+
+		<div class="col-lg-6">
+			<partial name="_BookSession"/>
+		</div>
+	}
+</div>
