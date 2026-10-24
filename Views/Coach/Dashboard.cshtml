@@ -130,9 +130,14 @@
 				}
 			</div>
 
-			@if (TempData["WorkPeriodError"] is string workPeriodError)
+			@if (TempData["WorkPeriodCreateError"] is string workPeriodCreateError)
 			{
-				<div class="alert alert-danger m-3 mb-0">@workPeriodError</div>
+				<div class="alert alert-danger m-3 mb-0">@workPeriodCreateError</div>
+			}
+
+			@if (TempData["WorkPeriodDeleteError"] is string workPeriodDeleteError)
+			{
+				<div class="alert alert-danger m-3 mb-0">@workPeriodDeleteError</div>
 			}
 
 			@if (!Model.WorkPeriods.Any())

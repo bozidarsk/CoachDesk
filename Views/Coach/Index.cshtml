@@ -90,16 +90,16 @@ else
 								<button class="btn btn-primary w-100" type="submit">Purchase plan</button>
 							</form>
 
-							@if (TempData["MembershipError"] is string membershipError)
+							@if (TempData["MembershipPurchaseError"] is string membershipPurchaseError)
 							{
 								<div class="text-danger">
 									@if (TempData["MembershipPlanId"] as Guid? == plan.Id)
 									{
-										<span>@membershipError</span>
+										<span>@membershipPurchaseError</span>
 									}
 									else
 									{
-										<span style="color: transparent;">@membershipError</span>
+										<span style="color: transparent;">@membershipPurchaseError</span>
 									}
 								</div>
 							}

@@ -58,9 +58,9 @@
 			}
 		</div>
 
-		@if (Model.ClientViewing && TempData["MembershipError"] is string membershipError)
+		@if (Model.ClientViewing && TempData["MembershipPurchaseError"] is string membershipPurchaseError)
 		{
-			<div class="text-danger">@membershipError</div>
+			<div class="text-danger">@membershipPurchaseError</div>
 		}
 
 		<div class="card">

@@ -21,14 +21,14 @@ public class WorkPeriodController : Controller
 
 		if (!ModelState.IsValid)
 		{
-			TempData["WorkPeriodError"] = "Invalid request data was provided.";
+			TempData["WorkPeriodCreateError"] = "Invalid request data was provided.";
 
 			return LocalRedirect(returnUrl);
 		}
 
 		if (model.Start >= model.End)
 		{
-			TempData["WorkPeriodError"] = "Start time must be less than End time.";
+			TempData["WorkPeriodCreateError"] = "Start time must be less than End time.";
 
 			return LocalRedirect(returnUrl);
 		}
@@ -63,7 +63,7 @@ public class WorkPeriodController : Controller
 
 		if (workPeriod == null || coach.Id != workPeriod.CoachId)
 		{
-			TempData["WorkPeriodError"] = "Invalid request data was provided.";
+			TempData["WorkPeriodDeleteError"] = "Invalid request data was provided.";
 
 			return LocalRedirect(returnUrl);
 		}

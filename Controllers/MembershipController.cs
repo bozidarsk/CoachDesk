@@ -24,7 +24,7 @@ public class MembershipController : Controller
 
 		if (membershipPlan == null)
 		{
-			TempData["MembershipError"] = "Invalid request data was provided.";
+			TempData["MembershipPurchaseError"] = "Invalid request data was provided.";
 
 			return LocalRedirect(returnUrl);
 		}
@@ -38,7 +38,7 @@ public class MembershipController : Controller
 			)
 		)
 		{
-			TempData["MembershipError"] = "You already have a membership from this coach.";
+			TempData["MembershipPurchaseError"] = "You already have a membership from this coach.";
 
 			return LocalRedirect(returnUrl);
 		}
