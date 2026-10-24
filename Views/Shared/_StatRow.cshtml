@@ -1,0 +1,15 @@
+@model IEnumerable<(string Label, string Value)>
+
+<div class="card mb-4">
+	<div class="card-body py-3">
+		<div class="row text-center g-3">
+			@foreach (var (label, value) in Model)
+			{
+				<div class="col-12 col-sm">
+					<div class="fs-3 fw-bold">@value</div>
+					<div class="text-muted small">@label</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>

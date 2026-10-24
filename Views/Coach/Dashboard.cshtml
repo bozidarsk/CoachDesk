@@ -1,0 +1,244 @@
+@model CoachDashboardViewModel
+@using Microsoft.AspNetCore.Http.Extensions
+
+@{
+	ViewData["Title"] = "Dashboard";
+
+	var stats = new[]
+	{
+		("Active clients", Model.Clients.Count.ToString()),
+		("Membership plans", Model.MembershipPlans.Count.ToString())
+	};
+
+	var week = new[]
+	{
+		DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday
+	};
+
+	var periodsByDay = Model.WorkPeriods
+		.GroupBy(x => x.DayOfWeek)
+		.ToDictionary(
+			x => x.Key,
+			x => x.OrderBy(p => p.Start).ToList()
+		)
+	;
+}
+
+<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+	<div class="me-auto">
+		<h1 class="h3 mb-0">Dashboard</h1>
+		<div class="text-muted">Welcome back, @Model.FullName</div>
+	</div>
+	<a class="btn btn-outline-secondary" asp-controller="Coach" asp-action="Index" asp-route-id="@Model.CoachId">View public profile</a>
+	<a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Index">Manage my account</a>
+</div>
+
+<partial name="_StatRow" model="stats"/>
+
+<div class="card mb-4">
+	<div class="card h-100">
+		<div class="card-header fw-bold">Upcoming sessions</div>
+		@if (!Model.UpcomingSessions.Any())
+		{
+			<div class="card-body text-muted">Nothing booked. Sessions appear here when clients book one of your free hours.</div>
+		}
+		else
+		{
+			<partial name="_SessionList" model="Model.UpcomingSessions"/>
+		}
+	</div>
+</div>
+
+<div class="row g-4 mb-4">
+	<div class="col-xl-8">
+		<div class="card h-100">
+			<div class="card-header fw-bold">Clients</div>
+			@if (!Model.Clients.Any())
+			{
+				<div class="card-body text-muted">No clients yet. Clients show up here once they purchase one of your membership plans.</div>
+			}
+			else
+			{
+				<div class="table-responsive">
+					<table class="table table-hover align-middle mb-0">
+						<thead class="table-light">
+							<tr>
+								<th>Client</th>
+								<th>Membership</th>
+								<th style="min-width:8rem">Sessions used</th>
+								<th>Next session</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var client in Model.Clients)
+							{
+								<tr>
+									<td>
+										<a class="fw-bold text-decoration-none" asp-controller="Client" asp-action="Index" asp-route-id="@client.ClientId">@client.FullName</a>
+									</td>
+									<td>
+										@if (client.ActivePlanName != null)
+										{
+											<div>@client.ActivePlanName</div>
+
+											@if (client.MembershipExpiresOn is DateTime expires)
+											{
+												<partial name="_ExpiryInfo" model="expires"/>
+											}
+										}
+										else
+										{
+											<span class="text-muted">No active plan</span>
+										}
+									</td>
+									<td>
+										@if (client.SessionsIncluded != null)
+										{
+											var pct = Math.Min(100, client.SessionsUsed * 100 / (int)client.SessionsIncluded);
+
+											<div class="small">@client.SessionsUsed of @client.SessionsIncluded</div>
+											<div class="progress" style="height:6px">
+												<div class="progress-bar" role="progressbar" style="width:@(pct)%"></div>
+											</div>
+										}
+										else
+										{
+											@client.SessionsUsed
+										}
+									</td>
+									<td>@(client.NextSession?.ToString("ddd dd MMM, HH:mm") ?? "None booked")</td>
+									<td class="text-end">
+										<a class="btn btn-sm btn-outline-primary" asp-controller="Client" asp-action="Index" asp-route-id="@client.ClientId">Manage client</a>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="col-xl-4">
+		<div class="card h-100">
+			<div class="card-header d-flex align-items-center">
+				<span class="fw-bold me-auto">Availability</span>
+				@if (Model.WorkPeriods.Any())
+				{
+					<span class="badge rounded-pill bg-light text-dark border">@Model.WeeklyHours.ToString("0.#")h per week</span>
+				}
+			</div>
+
+			@if (TempData["WorkPeriodError"] is string workPeriodError)
+			{
+				<div class="alert alert-danger m-3 mb-0">@workPeriodError</div>
+			}
+
+			@if (!Model.WorkPeriods.Any())
+			{
+				<div class="card-body text-muted">You haven't set any free hours yet, so clients can't book sessions with you. Add your first block below.</div>
+			}
+			else
+			{
+				<ul class="list-group list-group-flush">
+					@foreach (var day in week)
+					{
+						periodsByDay.TryGetValue(day, out var periods);
+
+						<li class="list-group-item d-flex gap-3">
+							<div class="fw-bold" style="min-width:6.5rem">@day</div>
+							<div class="flex-grow-1">
+								@if (periods is null)
+								{
+									<span class="text-muted">Not available</span>
+								}
+								else
+								{
+									foreach (var period in periods)
+									{
+										<div class="d-flex align-items-center gap-2 mb-1">
+											<span>@period.Start.ToString("HH:mm") to @period.End.ToString("HH:mm")</span>
+											<form class="ms-auto" asp-controller="WorkPeriod" asp-action="Delete" asp-route-id="@period.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
+												<button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+											</form>
+										</div>
+									}
+								}
+							</div>
+						</li>
+					}
+				</ul>
+			}
+
+			<div class="card-footer">
+				<form asp-controller="WorkPeriod" asp-action="Create" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
+					<div class="fw-bold mb-2">Add free hours</div>
+					<div class="mb-2">
+						<label for="DayOfWeek" class="form-label small mb-1">Day</label>
+						<select id="DayOfWeek" name="DayOfWeek" class="form-select">
+							@foreach (var day in week)
+							{
+								<option value="@day.ToString()">@day</option>
+							}
+						</select>
+					</div>
+					<div class="row g-2 mb-3">
+						<div class="col-6">
+							<label for="Start" class="form-label small mb-1">From</label>
+							<input id="Start" name="Start" type="time" class="form-control" required/>
+						</div>
+						<div class="col-6">
+							<label for="End" class="form-label small mb-1">To</label>
+							<input id="End" name="End" type="time" class="form-control" required/>
+						</div>
+					</div>
+					<button type="submit" class="btn btn-primary w-100">Add hours</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card mb-4">
+	<div class="card-header d-flex align-items-center">
+		<span class="fw-bold me-auto">Membership plans</span>
+		<a class="btn btn-sm btn-primary" asp-controller="MembershipPlan" asp-action="Create" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Add plan</a>
+	</div>
+	@if (!Model.MembershipPlans.Any())
+	{
+		<div class="card-body text-muted">You haven't created a plan yet. Add one so clients can sign up with you.</div>
+	}
+	else
+	{
+		<div class="table-responsive">
+			<table class="table table-hover align-middle mb-0">
+				<thead class="table-light">
+					<tr>
+						<th>Plan</th>
+						<th>Sessions</th>
+						<th>Duration</th>
+						<th>Price</th>
+						<th>Active clients</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var plan in Model.MembershipPlans)
+					{
+						<tr>
+							<td class="fw-bold">@plan.Name</td>
+							<td>@plan.Count</td>
+							<td>@(plan.Duration ?? 0) days</td>
+							<td>@plan.Price.ToString("C")</td>
+							<td>@plan.ActiveClients</td>
+							<td class="text-end text-nowrap">
+								<a class="btn btn-sm btn-outline-primary" asp-controller="MembershipPlan" asp-action="Details" asp-route-id="@plan.Id">Details</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</div>

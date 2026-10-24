@@ -1,0 +1,30 @@
+@model DateTime
+
+@{
+	var daysLeft = (Model.Date - DateTime.UtcNow.Date).Days;
+
+	// fails to compile ???
+	// var (css, text) = daysLeft switch
+	// {
+	// 	< 0  => ("bg-secondary", "Expired"),
+	// 	0    => ("bg-warning text-dark", "Expires today"),
+	// 	1    => ("bg-warning text-dark", "1 day left"),
+	// 	<= 7 => ("bg-warning text-dark", $"{daysLeft} days left"),
+	// 	_    => ("bg-success", $"{daysLeft} days left")
+	// };
+
+	string css, text;
+
+	if (daysLeft < 0)
+		(css, text) = ("bg-secondary", "Expired");
+	else if (daysLeft == 0)
+		(css, text) = ("bg-warning text-dark", "Expires today");
+	else if (daysLeft == 1)
+		(css, text) = ("bg-warning text-dark", "1 day left");
+	else if (daysLeft > 1 && daysLeft <= 7)
+		(css, text) = ("bg-warning text-dark", $"{daysLeft} days left");
+	else
+		(css, text) = ("bg-success", $"{daysLeft} days left");
+}
+
+<span class="small text-muted me-1">@Model.ToString("dd MMM yyyy")</span><span class="badge @css">@text</span>

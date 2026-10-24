@@ -1,0 +1,33 @@
+@model IEnumerable<SessionViewModel>
+@using Microsoft.AspNetCore.Http.Extensions
+
+<ul class="list-group list-group-flush">
+	@foreach (var session in Model)
+	{
+		@*
+		var badge = session.Status switch
+		{
+			"Completed" => "bg-success",
+			"Cancelled" => "bg-secondary",
+			_ => "bg-primary"
+		};
+		*@
+
+		<li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+			<div class="me-auto">
+				<div class="fw-bold">@session.Date.ToString("ddd, dd MMM yyyy")</div>
+				<div class="text-muted small">
+					@session.Date.ToString("HH:mm") with @session.CoachFullName
+				</div>
+			</div>
+			<!--@* <span class="badge @badge">@session.Status</span> *@-->
+			@if (session.CanCancel)
+			{
+				<form asp-controller="SessionController" asp-action="Cancel" asp-route-id="@session.Id" method="post" onsubmit="return confirm('Cancel this session?');">
+					<input type="hidden" name="returnUrl" value="@Context.Request.GetEncodedPathAndQuery()"/>
+					<button type="submit" class="btn btn-sm btn-outline-danger">Cancel session</button>
+				</form>
+			}
+		</li>
+	}
+</ul>
