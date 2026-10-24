@@ -19,8 +19,6 @@ public class WorkPeriodController : Controller
 	{
 		returnUrl ??= "/";
 
-		ViewData["ReturnUrl"] = returnUrl;
-
 		if (!ModelState.IsValid)
 		{
 			TempData["WorkPeriodError"] = "Invalid request data was provided.";
@@ -57,8 +55,6 @@ public class WorkPeriodController : Controller
 	public async Task<IActionResult> Delete(Guid? id, string? returnUrl)
 	{
 		returnUrl ??= "/";
-
-		ViewData["ReturnUrl"] = returnUrl;
 
 		var user = (await userManager.GetUserAsync(User))!;
 		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);

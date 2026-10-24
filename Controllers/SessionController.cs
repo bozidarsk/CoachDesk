@@ -17,8 +17,6 @@ public class SessionController : Controller
 	{
 		returnUrl ??= "/";
 
-		ViewData["ReturnUrl"] = returnUrl;
-
 		if (!ModelState.IsValid)
 		{
 			TempData["SessionBookError"] = "Invalid request data was provided.";
@@ -101,8 +99,6 @@ public class SessionController : Controller
 	public async Task<IActionResult> Cancel(Guid? id, string? returnUrl)
 	{
 		returnUrl ??= "/";
-
-		ViewData["ReturnUrl"] = returnUrl;
 
 		var session = await dbContext.Sessions.SingleOrDefaultAsync(x => x.Id == id);
 

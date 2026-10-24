@@ -18,8 +18,6 @@ public class MembershipController : Controller
 	{
 		returnUrl ??= "/";
 
-		ViewData["ReturnUrl"] = returnUrl;
-
 		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == membershipPlanId);
 
 		TempData["MembershipPlanId"] = membershipPlanId;
