@@ -1,4 +1,5 @@
 @model MembershipPlanViewModel
+@using Microsoft.AspNetCore.Http.Extensions
 
 @{
 	ViewData["Title"] = Model.Name;
@@ -40,8 +41,8 @@
 			@if (Model.OwnerViewing)
 			{
 				<div class="d-flex gap-2">
-					<a class="btn btn-primary" style="display: flex; align-items: center; justify-content: space-between;" asp-controller="MembershipPlan" asp-action="Edit" asp-route-id="@Model.Id" asp-route-returnUrl="/MembershipPlan/Details/@Model.Id">Edit plan</a>
-					<a class="btn btn-outline-danger" asp-controller="MembershipPlan" asp-action="Delete" asp-route-id="@Model.Id" asp-route-returnUrl="/MembershipPlan/Details/@Model.Id">Delete plan</a>
+					<a class="btn btn-primary" style="display: flex; align-items: center; justify-content: space-between;" asp-controller="MembershipPlan" asp-action="Edit" asp-route-id="@Model.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Edit plan</a>
+					<a class="btn btn-outline-danger" asp-controller="MembershipPlan" asp-action="Delete" asp-route-id="@Model.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()">Delete plan</a>
 				</div>
 			}
 			else if (Model.ClientViewing)
