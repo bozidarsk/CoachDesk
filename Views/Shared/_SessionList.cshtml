@@ -16,9 +16,7 @@
 <ul class="list-group list-group-flush">
 	@if (TempData["SessionCancelError"] is string sessionCancelError)
 	{
-		<li class="list-group-item d-flex flex-wrap align-items-center gap-2">
-			<span class="text-danger">@sessionCancelError</span>
-		</li>
+		<span class="alert alert-danger m-3 mb-0">@sessionCancelError</span>
 	}
 
 	@foreach (var session in Model)
