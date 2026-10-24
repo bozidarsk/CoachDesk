@@ -47,10 +47,16 @@
 			}
 			else if (Model.ClientViewing)
 			{
-				<!-- buy -->
+				<form asp-controller="Membership" asp-action="Purchase" asp-route-membershipPlanId="@Model.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
+					<button class="btn btn-primary" type="submit">Purchase plan</button>
+				</form>
 			}
-
 		</div>
+
+		@if (Model.ClientViewing && TempData["MembershipError"] is string membershipError)
+		{
+			<div class="text-danger">@membershipError</div>
+		}
 
 		<div class="card">
 			<div class="card-header fw-bold">Plan details</div>

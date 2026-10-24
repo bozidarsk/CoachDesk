@@ -77,9 +77,23 @@ else
 						</ul>
 						@if (Model.ClientViewing)
 						{
-							<form asp-controller="Membership" asp-action="Purchase" asp-route-planId="@plan.Id" method="post">
-								<button type="submit" class="btn btn-primary w-100">Purchase plan</button>
+							<form asp-controller="Membership" asp-action="Purchase" asp-route-membershipPlanId="@plan.Id" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
+								<button class="btn btn-primary w-100" type="submit">Purchase plan</button>
 							</form>
+
+							@if (TempData["MembershipError"] is string membershipError)
+							{
+								<div class="text-danger">
+									@if (TempData["MembershipPlanId"] as Guid? == plan.Id)
+									{
+										<span>@membershipError</span>
+									}
+									else
+									{
+										<span style="color: transparent;">@membershipError</span>
+									}
+								</div>
+							}
 						}
 						else if (!Model.IsLoggedIn)
 						{
