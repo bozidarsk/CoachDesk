@@ -1,0 +1,112 @@
+@model ClientDashboardViewModel
+
+@{
+	ViewData["Title"] = "Dashboard";
+
+	var stats = new List<(string, string)>()
+	{
+		("Sessions completed", Model.SessionsCompleted.ToString()),
+		("Current streak", Model.StreakWeeks == 1 ? "1 week" : $"{Model.StreakWeeks} weeks"),
+		("Active memberships", Model.Memberships.Count(x => x.Status == "Active").ToString()),
+	};
+}
+
+<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+	<div class="me-auto">
+		<h1 class="h3 mb-0">Dashboard</h1>
+		<div class="text-muted">Welcome back, @Model.FullName</div>
+	</div>
+	<a class="btn btn-primary" asp-controller="Client" asp-action="SearchCoaches">Find a coach</a>
+	<a class="btn btn-outline-secondary" asp-controller="Client" asp-action="Index" asp-route-id="@Model.ClientId">View public profile</a>
+	<a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Index">Manage my account</a>
+</div>
+
+<partial name="_StatRow" model="stats"/>
+
+<div class="card mb-4">
+	<div class="card h-100">
+		<div class="card-header fw-bold">Memberships</div>
+		@if (!Model.Memberships.Any())
+		{
+			<div class="card-body">
+				<p class="text-muted mb-3">You don't have a membership yet. Pick a coach and choose a plan to start booking sessions.</p>
+				<a class="btn btn-primary" asp-controller="Client" asp-action="SearchCoaches">Find a coach</a>
+			</div>
+		}
+		else
+		{
+			<div class="table-responsive">
+				<table class="table align-middle mb-0">
+					<thead class="table-light">
+						<tr>
+							<th>Plan</th>
+							<th>Coach</th>
+							<th style="min-width:8rem">Sessions used</th>
+							<th>Expires</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var membership in Model.Memberships)
+						{
+							var expired = membership.ExpiresOn?.Date < DateTime.UtcNow;
+
+							<tr class="@(expired ? "text-muted" : "")">
+								<td class="fw-bold">
+									@membership.PlanName
+								</td>
+								<td>
+									<a asp-controller="Coach" asp-action="Index" asp-route-id="@membership.CoachId">@membership.CoachName</a>
+								</td>
+								<td>
+									@if (membership.SessionsIncluded != null)
+									{
+										var pct = Math.Min(100, membership.SessionsUsed * 100 / (int)membership.SessionsIncluded);
+
+										<div class="small">@membership.SessionsUsed of @membership.SessionsIncluded</div>
+										<div class="progress" style="height:6px">
+											<div class="progress-bar" role="progressbar" style="width:@(pct)%"></div>
+										</div>
+									}
+									else
+									{
+										@membership.SessionsUsed
+									}
+								</td>
+								<td>
+									@if (membership.ExpiresOn != null)
+									{
+										<partial name="_ExpiryInfo" model="membership.ExpiresOn"/>
+									}
+									else
+									{
+										<span>Never</span>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	</div>
+</div>
+
+<div class="row g-4 mb-4">
+	<div class="col-xl-6">
+		<div class="card h-100">
+			<div class="card-header fw-bold">Upcoming sessions</div>
+			@if (!Model.UpcomingSessions.Any())
+			{
+				<div class="card-body text-muted">Nothing booked. Sessions appear here when clients book one of your free hours.</div>
+			}
+			else
+			{
+				<partial name="_SessionList" model="Model.UpcomingSessions"/>
+			}
+		</div>
+	</div>
+
+	<div class="col-lg-6">
+		<partial name="_BookSession" model="Model.SessionBooking"/>
+	</div>
+</div>

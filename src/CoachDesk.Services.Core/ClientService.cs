@@ -9,6 +9,7 @@ namespace CoachDesk.Services.Core;
 public class ClientService : IClientService
 {
 	private readonly ApplicationDbContext dbContext;
+	private readonly IMembershipService membershipService;
 
 	public async Task<CoachModel?> GetClientAsync(ApplicationUser user)
 	{
@@ -47,6 +48,49 @@ public class ClientService : IClientService
 		};
 	}
 
+	public async Task<IReadOnlyList<MembershipModel>> GetMembershipsAsync(Guid id)
+	{
+		return await dbContext.Memberships
+			.Where(x => x.ClientId == id)
+			.Select(x =>
+				new MembershipModel()
+				{
+					Id = x.Id,
+					ActivatedOn = x.ActivatedOn,
+					TimesUsed = x.TimesUsed,
+					MembershipPlanId = x.MembershipPlanId,
+					ClientId = id,
+					Status = membershipService.GetMembershipStatus(
+						activatedOn: x.ActivatedOn,
+						timesUsed: x.TimesUsed,
+						duration: x.MembershipPlan.Duration,
+						count: x.MembershipPlan.Count
+					),
+				}
+			)
+			.ToListAsync()
+		;
+	}
+
+	public async Task<IReadOnlyList<SessionModel>> GetUpcomingSessionsAsync(Guid id, Guid? withCoachId)
+	{
+		return await dbContext.Sessions
+			.Where(x => ((withCoachId == null) ? x.ClientId == id : x.ClientId == id && x.CoachId == withCoachId) && x.Date >= DateTime.UtcNow)
+			.OrderBy(x => x.Date)
+			.Select(x =>
+				new SessionModel()
+				{
+					Id = x.Id,
+					CoachId = x.CoachId,
+					ClientId = x.ClientId,
+					Date = x.Date,
+					Duration = x.Duration,
+				}
+			)
+			.ToListAsync()
+		;
+	}
+
 	public async Task AddClientAsync(string userId)
 	{
 		await dbContext.Clients.AddAsync(
@@ -59,8 +103,9 @@ public class ClientService : IClientService
 		await dbContext.SaveChangesAsync();
 	}
 
-	public ClientService(ApplicationDbContext dbContext)
+	public ClientService(ApplicationDbContext dbContext, IMembershipService membershipService)
 	{
 		this.dbContext = dbContext;
+		this.membershipService = membershipService;
 	}
 }

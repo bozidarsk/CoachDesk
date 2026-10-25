@@ -1,0 +1,114 @@
+@model ClientIndexViewModel
+
+@{
+	ViewData["Title"] = Model.FullName;
+
+	var stats = new List<(string, string)>()
+	{
+		("Sessions completed", Model.SessionsCompleted.ToString()),
+		("Current streak", Model.StreakWeeks == 1 ? "1 week" : $"{Model.StreakWeeks} weeks")
+	};
+
+	if (Model.OwnerViewing || Model.CoachOfClientViewing)
+	{
+		stats.Add(("Active memberships", Model.Memberships.Count(x => x.Status == "Active").ToString()));
+	}
+}
+
+<div class="card shadow-sm mb-4">
+	<div class="card-body p-4">
+		<div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+			<div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width:80px;height:80px;font-size:1.75rem">@Model.Initials</div>
+
+			<div class="flex-grow-1">
+				<h1 class="h3 mb-1">@Model.FullName</h1>
+				<div class="text-muted">Client, member since @Model.MemberSince.ToString("MMMM yyyy")</div>
+			</div>
+
+			@if (Model.OwnerViewing)
+			{
+				<div class="d-grid gap-2">
+					<a class="btn btn-primary" asp-controller="Client" asp-action="Dashboard">Open dashboard</a>
+					<a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Index">Manage my account</a>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+<partial name="_StatRow" model="stats"/>
+
+@if (!Model.OwnerViewing && !Model.CoachOfClientViewing)
+{
+	<div class="alert alert-light border">Memberships ans sessions are only visible to this client and their coaches.</div>
+}
+
+@if (Model.OwnerViewing)
+{
+	<div class="card mb-4">
+		<div class="card h-100">
+			<div class="card-header fw-bold">Memberships</div>
+			@if (!Model.Memberships.Any())
+			{
+				<div class="card-body">
+					<p class="text-muted mb-3">No memberships purchased yet.</p>
+					@if (Model.OwnerViewing)
+					{
+						<a class="btn btn-primary" asp-controller="Client" asp-action="SearchCoaches">Find a coach</a>
+					}
+				</div>
+			}
+			else
+			{
+				<ul class="list-group list-group-flush">
+					@foreach (var membership in Model.Memberships)
+					{
+						<li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+							<div class="me-auto">
+								<div class="fw-bold">@membership.PlanName</div>
+								<div class="text-muted small">
+									With <a asp-controller="Coach" asp-action="Index" asp-route-id="@membership.CoachId">@membership.CoachName</a>,
+									@if (membership.SessionsIncluded != null)
+									{
+										<span>@membership.SessionsUsed of @membership.SessionsIncluded sessions used</span>
+									}
+									else
+									{
+										<span>@membership.SessionsUsed sessions used</span>
+									}
+								</div>
+							</div>
+							<div>
+								@if (membership.ExpiresOn != null)
+								{
+									<partial name="_ExpiryInfo" model="membership.ExpiresOn"/>
+								}
+								else
+								{
+									<span>Valid forever</span>
+								}
+							</div>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</div>
+}
+
+@if (Model.OwnerViewing || Model.CoachOfClientViewing)
+{
+	<div class="card mb-4">
+		<div class="card h-100">
+			<div class="card-header fw-bold">Upcoming sessions</div>
+			@if (!Model.UpcomingSessions.Any())
+			{
+				<div class="card-body text-muted">Nothing booked. Sessions appear here when they are booked.</div>
+			}
+			else
+			{
+				<partial name="_SessionList" model="Model.UpcomingSessions"/>
+			}
+		</div>
+	</div>
+}
