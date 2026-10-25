@@ -168,7 +168,7 @@ public class CoachController : Controller
 						MembershipExpiresOn = membership?.ActivatedOn.AddDays(membershipPlan?.Duration ?? 0),
 						SessionsUsed = membership?.TimesUsed ?? 0,
 						SessionsIncluded = membershipPlan?.Count,
-						// TODO: set NextSession
+						NextSession = (await coachService.GetUpcomingSessionsAsync(coach.Id, withClientId: x.Id)).FirstOrDefault()?.Date,
 					};
 				}
 			)
