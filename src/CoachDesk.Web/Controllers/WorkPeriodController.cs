@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using CoachDesk.Data;
 using CoachDesk.ViewModels.WorkPeriod;
+using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;
@@ -11,7 +11,8 @@ namespace CoachDesk.Controllers;
 [Authorize(Roles = CoachRole)]
 public class WorkPeriodController : Controller
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IWorkPeriodService workPeriodService;
+	private readonly ICoachService coachService;
 	private readonly UserManager<ApplicationUser> userManager;
 
 	[HttpPost]
@@ -34,19 +35,14 @@ public class WorkPeriodController : Controller
 		}
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		coach.WorkPeriods.Add(
-			new()
-			{
-				DayOfWeek = model.DayOfWeek,
-				Start = model.Start,
-				End = model.End,
-				CoachId = coach.Id,
-			}
+		await workPeriodService.AddWorkPeriodAsync(
+			dayOfWeek: model.DayOfWeek,
+			start: model.Start,
+			end: model.End,
+			coachId: coach.Id
 		);
-
-		await dbContext.SaveChangesAsync();
 
 		return LocalRedirect(returnUrl);
 	}
@@ -57,9 +53,9 @@ public class WorkPeriodController : Controller
 		returnUrl ??= "/";
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		var workPeriod = await dbContext.WorkPeriods.SingleOrDefaultAsync(x => x.Id == id);
+		var workPeriod = await workPeriodService.GetWorkPeriodAsync(id ?? default);
 
 		if (workPeriod == null || coach.Id != workPeriod.CoachId)
 		{
@@ -68,14 +64,15 @@ public class WorkPeriodController : Controller
 			return LocalRedirect(returnUrl);
 		}
 
-		await dbContext.WorkPeriods.Where(x => x.Id == id).ExecuteDeleteAsync();
+		await workPeriodService.DeleteWorkPeriodsAsync((Guid)id!);
 
 		return LocalRedirect(returnUrl);
 	}
 
-	public WorkPeriodController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+	public WorkPeriodController(IWorkPeriodService workPeriodService, ICoachService coachService, UserManager<ApplicationUser> userManager)
 	{
-		this.dbContext = dbContext;
+		this.workPeriodService = workPeriodService;
+		this.coachService = coachService;
 		this.userManager = userManager;
 	}
 }

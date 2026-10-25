@@ -40,7 +40,7 @@
 			<div class="alert alert-danger">@sessionBookError</div>
 		}
 
-		@if (Model.ViewingClientMembershipStatus != MembershipStatus.Active)
+		@if (Model.ViewingClientMembershipStatus != "Active")
 		{
 			<p class="text-muted mb-0">You don't have an active membership from this coach. Purchase one first.</p>
 		}

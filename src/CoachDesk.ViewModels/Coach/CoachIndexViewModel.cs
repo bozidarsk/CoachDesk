@@ -1,4 +1,3 @@
-using CoachDesk.ViewModels.Membership;
 using CoachDesk.ViewModels.MembershipPlan;
 using CoachDesk.ViewModels.Session;
 using CoachDesk.ViewModels.WorkPeriod;
@@ -21,7 +20,7 @@ public class CoachIndexViewModel
 	public bool ClientViewing { set; get; }
 
 	public Guid? ViewingClientId { set; get; }
-	public MembershipStatus? ViewingClientMembershipStatus { set; get; }
+	public string? ViewingClientMembershipStatus { set; get; }
 	public IReadOnlyList<SessionViewModel>? ViewingClientUpcomingSessions { set; get; }
 
 	public IReadOnlyList<SessionViewModel> UpcomingSessions { set; get; } = null!;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CoachDesk.Data;
 using CoachDesk.ViewModels.Account;
+using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 using static CoachDesk.Common.EntityValidation.User;
 
@@ -11,7 +12,8 @@ namespace CoachDesk.Controllers;
 
 public class AccountController : Controller
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly ICoachService coachService;
+	private readonly IClientService clientService;
 	private readonly UserManager<ApplicationUser> userManager;
 	private readonly SignInManager<ApplicationUser> signInManager;
 
@@ -71,11 +73,9 @@ public class AccountController : Controller
 		}
 
 		if (model.RegisterAsCoach)
-			await dbContext.Coaches.AddAsync(new() { UserId = user.Id });
+			await coachService.AddCoachAsync(user.Id);
 		else
-			await dbContext.Clients.AddAsync(new() { UserId = user.Id });
-
-		await dbContext.SaveChangesAsync();
+			await clientService.AddClientAsync(user.Id);
 
 		await userManager.AddToRoleAsync(user, model.RegisterAsCoach ? CoachRole : ClientRole);
 		await signInManager.SignInAsync(user, isPersistent: model.StayLoggedIn);
@@ -166,9 +166,15 @@ public class AccountController : Controller
 		return true;
 	}
 
-	public AccountController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+	public AccountController(
+		ICoachService coachService,
+		IClientService clientService,
+		UserManager<ApplicationUser> userManager,
+		SignInManager<ApplicationUser> signInManager
+	)
 	{
-		this.dbContext = dbContext;
+		this.coachService = coachService;
+		this.clientService = clientService;
 		this.userManager = userManager;
 		this.signInManager = signInManager;
 	}

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
+using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;
@@ -10,7 +10,9 @@ namespace CoachDesk.Controllers;
 [Authorize(Roles = ClientRole)]
 public class MembershipController : Controller
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IMembershipService membershipService;
+	private readonly IMembershipPlanService membershipPlanService;
+	private readonly IClientService clientService;
 	private readonly UserManager<ApplicationUser> userManager;
 
 	[HttpPost]
@@ -18,7 +20,7 @@ public class MembershipController : Controller
 	{
 		returnUrl ??= "/";
 
-		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == membershipPlanId);
+		var membershipPlan = await membershipPlanService.GetMembershipPlanAsync(membershipPlanId ?? default);
 
 		TempData["MembershipPlanId"] = membershipPlanId;
 
@@ -30,48 +32,36 @@ public class MembershipController : Controller
 		}
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var client = await dbContext.Clients.SingleAsync(x => x.UserId == user.Id);
+		var client = (await clientService.GetClientAsync(user))!;
 
-		if (await dbContext.Memberships.AnyAsync(x =>
-				x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId
-				&& !((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) <= DateTime.UtcNow : false)
-				&& !((x.MembershipPlan.Count != null) ? x.TimesUsed >= x.MembershipPlan.Count : false)
-			)
-		)
+		var membership = await membershipService.GetMembershipAsync(membershipPlanId: null, coachId: membershipPlan.CoachId, clientId: client.Id);
+
+		if (membership?.Status == "Active")
 		{
 			TempData["MembershipPurchaseError"] = "You already have a membership from this coach.";
 
 			return LocalRedirect(returnUrl);
 		}
+		else if (membership != null)
+		{
+			await membershipService.DeleteMembershipsAsync(membership.Id);
+		}
 
-		await dbContext.Memberships
-			.Where(x =>
-				x.ClientId == client.Id && x.MembershipPlan.CoachId == membershipPlan.CoachId
-				&& (
-					((x.MembershipPlan.Duration != null) ? x.ActivatedOn.AddDays((int)x.MembershipPlan.Duration) <= DateTime.UtcNow : false)
-					|| ((x.MembershipPlan.Count != null) ? x.TimesUsed >= x.MembershipPlan.Count : false)
-				)
-			)
-			.ExecuteDeleteAsync()
-		;
-
-		await dbContext.Memberships.AddAsync(
-			new()
-			{
-				ActivatedOn = DateTime.UtcNow,
-				MembershipPlanId = (Guid)membershipPlanId!,
-				ClientId = client.Id,
-			}
-		);
-
-		await dbContext.SaveChangesAsync();
+		await membershipService.AddMembershipAsync(membershipPlan.Id, client.Id);
 
 		return LocalRedirect(returnUrl);
 	}
 
-	public MembershipController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+	public MembershipController(
+		IMembershipService membershipService,
+		IMembershipPlanService membershipPlanService,
+		IClientService clientService,
+		UserManager<ApplicationUser> userManager
+	)
 	{
-		this.dbContext = dbContext;
+		this.membershipService = membershipService;
+		this.membershipPlanService = membershipPlanService;
+		this.clientService = clientService;
 		this.userManager = userManager;
 	}
 }

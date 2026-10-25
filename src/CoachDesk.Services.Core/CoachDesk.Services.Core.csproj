@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoachDesk.Common\CoachDesk.Common.csproj" />
+    <ProjectReference Include="..\CoachDesk.Services.Models\CoachDesk.Services.Models.csproj" />
+    <ProjectReference Include="..\CoachDesk.Data\CoachDesk.Data.csproj" />
+    <ProjectReference Include="..\CoachDesk.Data.Models\CoachDesk.Data.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.13" />
+  </ItemGroup>
+
+</Project>

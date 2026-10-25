@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using CoachDesk.ViewModels.Membership;
 using static CoachDesk.Common.EntityValidation.MembershipPlan;
 
 namespace CoachDesk.ViewModels.MembershipPlan;
@@ -22,5 +21,5 @@ public class MembershipPlanViewModel
 	public int ActiveClients { set; get; }
 	public bool OwnerViewing { set; get; }
 	public bool ClientViewing { set; get; }
-	public MembershipStatus MembershipStatus { set; get; }
+	public string? MembershipStatus { set; get; }
 }

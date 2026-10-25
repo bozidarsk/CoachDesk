@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using CoachDesk.Data;
-using CoachDesk.Data.Models;
 using CoachDesk.ViewModels.Session;
+using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;
 
 public class SessionController : Controller
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly ISessionService sessionService;
+	private readonly ICoachService coachService;
+	private readonly IClientService clientService;
+	private readonly IMembershipService membershipService;
 
 	[HttpPost, Authorize(Roles = ClientRole)]
 	public async Task<IActionResult> Book(SessionInputModel model, string? returnUrl)
@@ -24,38 +25,28 @@ public class SessionController : Controller
 			return LocalRedirect(returnUrl);
 		}
 
-		if (!await dbContext.Coaches.AnyAsync(x => x.Id == model.CoachId))
+		if (await coachService.GetCoachAsync(model.CoachId) == null)
 		{
 			TempData["SessionBookError"] = $"No coach with id '{model.CoachId}' was found.";
 
 			return LocalRedirect(returnUrl);
 		}
 
-		if (!await dbContext.Clients.AnyAsync(x => x.Id == model.ClientId))
+		if (await clientService.GetClientAsync(model.ClientId) == null)
 		{
 			TempData["SessionBookError"] = $"No client with id '{model.ClientId}' was found.";
 
 			return LocalRedirect(returnUrl);
 		}
 
-		// cannot do it in one AnyAsync call because it fails to translate it to sql
-		IReadOnlyList<Session> coachSessions = await dbContext.Sessions.Where(x => x.CoachId == model.CoachId).ToListAsync();
-
-		foreach (var x in coachSessions)
+		if (!await coachService.IsAvailable(model.CoachId, model.Date, model.Duration))
 		{
-			if (model.Date >= x.Date && model.Date < x.Date + x.Duration)
-			{
-				TempData["SessionBookError"] = "There is a booked session during the requested time period.";
+			TempData["SessionBookError"] = "The coach is not available during the requested time period.";
 
-				return LocalRedirect(returnUrl);
-			}
+			return LocalRedirect(returnUrl);
 		}
 
-		var membership = await dbContext.Memberships
-			.Include(x => x.MembershipPlan)
-			.Where(x => x.MembershipPlan.CoachId == model.CoachId && x.ClientId == model.ClientId)
-			.SingleOrDefaultAsync()
-		;
+		var membership = await membershipService.GetMembershipAsync(membershipPlanId: null, coachId: model.CoachId, clientId: model.ClientId);
 
 		if (membership == null)
 		{
@@ -64,33 +55,28 @@ public class SessionController : Controller
 			return LocalRedirect(returnUrl);
 		}
 
-		if (membership.MembershipPlan.Duration != null && membership.ActivatedOn.AddDays((int)membership.MembershipPlan.Duration) < DateTime.UtcNow)
+		if (membership.Status == "Expired")
 		{
 			TempData["SessionBookError"] = "Your membership has expired, purchase a new one first.";
 
 			return LocalRedirect(returnUrl);
 		}
 
-		if (membership.MembershipPlan.Count != null && membership.TimesUsed >= (int)membership.MembershipPlan.Count)
+		if (membership.Status == "OutOfSessions")
 		{
 			TempData["SessionBookError"] = "You have reached the limit of sessions for your membership, purchase a new one first.";
 
 			return LocalRedirect(returnUrl);
 		}
 
-		membership.TimesUsed++;
+		await membershipService.UseMembersipAsync(membership.Id);
 
-		await dbContext.Sessions.AddAsync(
-			new()
-			{
-				Date = model.Date,
-				Duration = model.Duration,
-				CoachId = model.CoachId,
-				ClientId = model.ClientId,
-			}
+		await sessionService.AddSessionAsync(
+			date: model.Date,
+			duration: model.Duration,
+			coachId: model.CoachId,
+			clientId: model.ClientId
 		);
-
-		await dbContext.SaveChangesAsync();
 
 		return LocalRedirect(returnUrl);
 	}
@@ -100,7 +86,7 @@ public class SessionController : Controller
 	{
 		returnUrl ??= "/";
 
-		var session = await dbContext.Sessions.SingleOrDefaultAsync(x => x.Id == id);
+		var session = await sessionService.GetSessionAsync(id ?? default);
 
 		if (session == null)
 		{
@@ -116,16 +102,21 @@ public class SessionController : Controller
 			return LocalRedirect(returnUrl);
 		}
 
-		await dbContext.Sessions
-			.Where(x => x.Id == session.Id)
-			.ExecuteDeleteAsync()
-		;
+		await sessionService.DeleteSessionsAsync(session.Id);
 
 		return LocalRedirect(returnUrl);
 	}
 
-	public SessionController(ApplicationDbContext dbContext)
+	public SessionController(
+		ISessionService sessionService,
+		ICoachService coachService,
+		IClientService clientService,
+		IMembershipService membershipService
+	)
 	{
-		this.dbContext = dbContext;
+		this.sessionService = sessionService;
+		this.coachService = coachService;
+		this.clientService = clientService;
+		this.membershipService = membershipService;
 	}
 }

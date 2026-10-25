@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
-using CoachDesk.Data.Models;
-using CoachDesk.ViewModels.Membership;
 using CoachDesk.ViewModels.MembershipPlan;
+using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 using static CoachDesk.Common.EntityValidation.MembershipPlan;
 
@@ -14,14 +12,17 @@ namespace CoachDesk.Controllers;
 [Authorize(Roles = CoachRole)]
 public class MembershipPlanController : Controller
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IMembershipPlanService membershipPlanService;
+	private readonly IMembershipService membershipService;
+	private readonly ICoachService coachService;
+	private readonly IClientService clientService;
 	private readonly UserManager<ApplicationUser> userManager;
 	private readonly SignInManager<ApplicationUser> signInManager;
 
 	[AllowAnonymous]
 	public async Task<IActionResult> Details(Guid? id)
 	{
-		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == id);
+		var membershipPlan = await membershipPlanService.GetMembershipPlanAsync(id ?? default);
 
 		if (membershipPlan == null)
 			return BadRequest();
@@ -36,13 +37,13 @@ public class MembershipPlanController : Controller
 
 			if (await userManager.IsInRoleAsync(user, CoachRole))
 			{
-				var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+				var coach = (await coachService.GetCoachAsync(user))!;
 
 				ownerViewing = coach.Id == membershipPlan.CoachId;
 			}
 			else if (await userManager.IsInRoleAsync(user, ClientRole))
 			{
-				var client = await dbContext.Clients.SingleAsync(x => x.UserId == user.Id);
+				var client = (await clientService.GetClientAsync(user))!;
 
 				clientViewing = true;
 				clientId = client.Id;
@@ -57,26 +58,12 @@ public class MembershipPlanController : Controller
 				Price = membershipPlan.Price,
 				Count = membershipPlan.Count,
 				Duration = membershipPlan.Duration,
-				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
+				ActiveClients = await membershipPlanService.CountMembershipsAsync(membershipPlan.Id),
 				OwnerViewing = ownerViewing,
 				ClientViewing = clientViewing,
-				MembershipStatus = GetMembershipStatus(await dbContext.Memberships.Include(x => x.MembershipPlan).SingleOrDefaultAsync(x => x.MembershipPlanId == membershipPlan.Id && x.ClientId == clientId)),
+				MembershipStatus = clientViewing ? (await membershipService.GetMembershipAsync(membershipPlanId: membershipPlan.Id, coachId: null, clientId: clientId))?.Status : null,
 			}
 		);
-	}
-
-	private static MembershipStatus GetMembershipStatus(Membership? membership)
-	{
-		if (membership == null)
-			return MembershipStatus.Unknown;
-
-		if ((membership.MembershipPlan.Duration != null) ? membership.ActivatedOn.AddDays((int)membership.MembershipPlan.Duration) <= DateTime.UtcNow : false)
-			return MembershipStatus.Expired;
-
-		if ((membership.MembershipPlan.Count != null) ? membership.TimesUsed >= membership.MembershipPlan.Count : false)
-			return MembershipStatus.OutOfSessions;
-
-		return MembershipStatus.Active;
 	}
 
 	[HttpGet]
@@ -119,20 +106,15 @@ public class MembershipPlanController : Controller
 			return View(model);
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		coach.MembershipPlans.Add(
-			new()
-			{
-				Name = model.Name,
-				Price = model.Price,
-				Count = model.Count,
-				Duration = model.Duration,
-				CoachId = coach.Id,
-			}
+		await membershipPlanService.AddMembershipPlanAsync(
+			name: model.Name,
+			price: model.Price,
+			count: model.Count,
+			duration: model.Duration,
+			coachId: coach.Id
 		);
-
-		await dbContext.SaveChangesAsync();
 
 		return LocalRedirect(returnUrl);
 	}
@@ -145,9 +127,9 @@ public class MembershipPlanController : Controller
 		ViewData["ReturnUrl"] = returnUrl;
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == id);
+		var membershipPlan = await membershipPlanService.GetMembershipPlanAsync(id ?? default);
 
 		if (membershipPlan == null || coach.Id != membershipPlan.CoachId)
 			return BadRequest();
@@ -160,7 +142,7 @@ public class MembershipPlanController : Controller
 				Price = membershipPlan.Price,
 				Count = membershipPlan.Count,
 				Duration = membershipPlan.Duration,
-				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
+				ActiveClients = await membershipPlanService.CountMembershipsAsync(membershipPlan.Id),
 				OwnerViewing = true,
 				ClientViewing = false,
 			}
@@ -175,9 +157,9 @@ public class MembershipPlanController : Controller
 		ViewData["ReturnUrl"] = returnUrl;
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == model.Id);
+		var membershipPlan = await membershipPlanService.GetMembershipPlanAsync(model.Id);
 
 		if (!ModelState.IsValid || membershipPlan == null || coach.Id != membershipPlan.CoachId)
 		{
@@ -201,12 +183,13 @@ public class MembershipPlanController : Controller
 		if (!ModelState.IsValid)
 			return View(model);
 
-		membershipPlan.Name = model.Name;
-		membershipPlan.Price = model.Price;
-		membershipPlan.Count = model.Count;
-		membershipPlan.Duration = model.Duration;
-
-		await dbContext.SaveChangesAsync();
+		await membershipPlanService.EditMembershipPlanAsync(
+			id: membershipPlan.Id,
+			name: model.Name,
+			price: model.Price,
+			count: model.Count,
+			duration: model.Duration
+		);
 
 		return LocalRedirect(returnUrl);
 	}
@@ -219,9 +202,9 @@ public class MembershipPlanController : Controller
 		ViewData["ReturnUrl"] = returnUrl;
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == id);
+		var membershipPlan = await membershipPlanService.GetMembershipPlanAsync(id ?? default);
 
 		if (membershipPlan == null || coach.Id != membershipPlan.CoachId)
 			return BadRequest();
@@ -234,7 +217,7 @@ public class MembershipPlanController : Controller
 				Price = membershipPlan.Price,
 				Count = membershipPlan.Count,
 				Duration = membershipPlan.Duration,
-				ActiveClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == membershipPlan.Id).CountAsync(),
+				ActiveClients = await membershipPlanService.CountMembershipsAsync(membershipPlan.Id),
 				OwnerViewing = true,
 				ClientViewing = false,
 			}
@@ -249,9 +232,9 @@ public class MembershipPlanController : Controller
 		ViewData["ReturnUrl"] = returnUrl;
 
 		var user = (await userManager.GetUserAsync(User))!;
-		var coach = await dbContext.Coaches.SingleAsync(x => x.UserId == user.Id);
+		var coach = (await coachService.GetCoachAsync(user))!;
 
-		var membershipPlan = await dbContext.MembershipPlans.SingleOrDefaultAsync(x => x.Id == model.Id);
+		var membershipPlan = await membershipPlanService.GetMembershipPlanAsync(model.Id);
 
 		if (membershipPlan == null || coach.Id != membershipPlan.CoachId)
 		{
@@ -260,7 +243,7 @@ public class MembershipPlanController : Controller
 			return View(model);
 		}
 
-		var activeClients = await dbContext.Memberships.Where(x => x.MembershipPlanId == model.Id).CountAsync();
+		var activeClients = await membershipPlanService.CountMembershipsAsync(membershipPlan.Id);
 
 		if (activeClients > 0)
 		{
@@ -269,14 +252,24 @@ public class MembershipPlanController : Controller
 			return View(model);
 		}
 
-		await dbContext.MembershipPlans.Where(x => x.Id == model.Id).ExecuteDeleteAsync();
+		await membershipPlanService.DeleteMembershipPlansAsync(membershipPlan.Id);
 
 		return LocalRedirect(returnUrl);
 	}
 
-	public MembershipPlanController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+	public MembershipPlanController(
+		IMembershipPlanService membershipPlanService,
+		IMembershipService membershipService,
+		ICoachService coachService,
+		IClientService clientService,
+		UserManager<ApplicationUser> userManager,
+		SignInManager<ApplicationUser> signInManager
+	)
 	{
-		this.dbContext = dbContext;
+		this.membershipPlanService = membershipPlanService;
+		this.membershipService = membershipService;
+		this.coachService = coachService;
+		this.clientService = clientService;
 		this.userManager = userManager;
 		this.signInManager = signInManager;
 	}

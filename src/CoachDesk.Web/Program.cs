@@ -2,12 +2,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
 using CoachDesk.Common;
+using CoachDesk.Services.Core;
+using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ICoachService, CoachService>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IMembershipPlanService, MembershipPlanService>();
+builder.Services.AddScoped<IMembershipService, MembershipService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IWorkPeriodService, WorkPeriodService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 	{

@@ -70,16 +70,16 @@ else
 				<div class="card h-100">
 					<div class="card-body d-flex flex-column">
 						<h3 class="h5">@plan.Name
-							@if (plan.MembershipStatus != MembershipStatus.Unknown)
+							@if (plan.MembershipStatus != null)
 							{
 								var css = plan.MembershipStatus switch
 								{
-									MembershipStatus.Active => "bg-success",
-									MembershipStatus.Expired or MembershipStatus.OutOfSessions => "bg-light",
+									"Active" => "bg-success",
+									"Expired" or "OutOfSessions" => "bg-light",
 									_ => "",
 								};
 
-								<span class="badge rounded-pill @css text-dark border">@plan.MembershipStatus.ToString()</span>
+								<span class="badge rounded-pill @css text-dark border">@plan.MembershipStatus</span>
 							}
 						</h3>
 						<div class="h4 mb-3">@plan.Price.ToString("C")</div>

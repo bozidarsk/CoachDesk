@@ -35,16 +35,16 @@
 		<div class="d-flex flex-wrap align-items-start gap-2 mb-4">
 			<div class="me-auto">
 				<h1 class="h3 mb-1">@Model.Name
-					@if (Model.MembershipStatus != MembershipStatus.Unknown)
+					@if (Model.MembershipStatus != null)
 					{
 						var css = Model.MembershipStatus switch
 						{
-							MembershipStatus.Active => "bg-success",
-							MembershipStatus.Expired or MembershipStatus.OutOfSessions => "bg-light",
+							"Active" => "bg-success",
+							"Expired" or "OutOfSessions" => "bg-light",
 							_ => "",
 						};
 
-						<span class="badge rounded-pill @css text-dark border">@Model.MembershipStatus.ToString()</span>
+						<span class="badge rounded-pill @css text-dark border">@Model.MembershipStatus</span>
 					}
 				</h1>
 				<div class="text-muted">@sessionsText, @validityText</div>

@@ -10,6 +10,8 @@
     <ProjectReference Include="..\CoachDesk.Common\CoachDesk.Common.csproj" />
     <ProjectReference Include="..\CoachDesk.Data.Common\CoachDesk.Data.Common.csproj" />
     <ProjectReference Include="..\CoachDesk.Data\CoachDesk.Data.csproj" />
+    <ProjectReference Include="..\CoachDesk.Services.Core\CoachDesk.Services.Core.csproj" />
+    <ProjectReference Include="..\CoachDesk.Services.Models\CoachDesk.Services.Models.csproj" />
     <ProjectReference Include="..\CoachDesk.ViewModels\CoachDesk.ViewModels.csproj" />
   </ItemGroup>
 
