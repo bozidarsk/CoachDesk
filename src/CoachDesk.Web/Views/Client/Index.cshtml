@@ -22,7 +22,11 @@
 
 			<div class="flex-grow-1">
 				<h1 class="h3 mb-1">@Model.FullName</h1>
-				<div class="text-muted">Client, member since @Model.MemberSince.ToString("MMMM yyyy")</div>
+				<div class="text-muted mb-2">Client, member since @Model.MemberSince.ToString("MMMM yyyy")</div>
+				@if (!string.IsNullOrWhiteSpace(Model.Bio))
+				{
+					<p class="mt-3 mb-0">@Model.Bio</p>
+				}
 			</div>
 
 			@if (Model.OwnerViewing)

@@ -4,8 +4,6 @@
 @{
 	ViewData["Title"] = Model.FullName;
 
-	var specialities = new string[] { "Test", "test" }; // TODO
-
 	var stats = new[]
 	{
 		("Current clients", Model.ActiveClients.ToString()),
@@ -34,10 +32,6 @@
 			<div class="flex-grow-1">
 				<h1 class="h3 mb-1">@Model.FullName</h1>
 				<div class="text-muted mb-2">Coach, member since @Model.MemberSince.ToString("MMMM yyyy")</div>
-				@foreach (var specialty in specialities)
-				{
-					<span class="badge rounded-pill bg-light text-dark border me-1">@specialty</span>
-				}
 				@if (!string.IsNullOrWhiteSpace(Model.Bio))
 				{
 					<p class="mt-3 mb-0">@Model.Bio</p>
