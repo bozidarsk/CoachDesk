@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using CoachDesk.ViewModels.Enums;
+using CoachDesk.ViewModels.Membership;
 using static CoachDesk.Common.EntityValidation.MembershipPlan;
 
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.MembershipPlan;
 
 public class MembershipPlanViewModel
 {

@@ -1,4 +1,4 @@
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.WorkPeriod;
 
 public class WorkPeriodViewModel
 {

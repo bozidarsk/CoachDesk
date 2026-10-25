@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 using static CoachDesk.Common.EntityValidation.User;
 
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.Account;
 
 public class AccountRegisterInputModel
 {

@@ -1,4 +1,4 @@
-namespace CoachDesk.ViewModels.Enums;
+namespace CoachDesk.ViewModels.Membership;
 
 public enum MembershipStatus
 {

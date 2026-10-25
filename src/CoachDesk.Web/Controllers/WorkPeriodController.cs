@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using CoachDesk.Data;
-using CoachDesk.ViewModels;
+using CoachDesk.ViewModels.WorkPeriod;
 using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;

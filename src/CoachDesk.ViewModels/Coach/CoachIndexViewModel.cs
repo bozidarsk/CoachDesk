@@ -1,6 +1,9 @@
-using CoachDesk.ViewModels.Enums;
+using CoachDesk.ViewModels.Membership;
+using CoachDesk.ViewModels.MembershipPlan;
+using CoachDesk.ViewModels.Session;
+using CoachDesk.ViewModels.WorkPeriod;
 
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.Coach;
 
 public class CoachIndexViewModel
 {

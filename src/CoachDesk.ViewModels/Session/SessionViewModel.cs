@@ -1,4 +1,4 @@
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.Session;
 
 public class SessionViewModel
 {

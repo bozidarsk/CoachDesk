@@ -1,4 +1,8 @@
-namespace CoachDesk.ViewModels;
+using CoachDesk.ViewModels.MembershipPlan;
+using CoachDesk.ViewModels.Session;
+using CoachDesk.ViewModels.WorkPeriod;
+
+namespace CoachDesk.ViewModels.Coach;
 
 public class CoachDashboardViewModel
 {

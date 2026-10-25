@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.Session;
 
 public class SessionInputModel
 {

@@ -1,4 +1,4 @@
-namespace CoachDesk.ViewModels;
+namespace CoachDesk.ViewModels.Coach;
 
 public class CoachClientRowViewModel
 {

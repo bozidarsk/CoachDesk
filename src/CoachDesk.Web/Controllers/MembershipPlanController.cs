@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
 using CoachDesk.Data.Models;
-using CoachDesk.ViewModels;
-using CoachDesk.ViewModels.Enums;
+using CoachDesk.ViewModels.Membership;
+using CoachDesk.ViewModels.MembershipPlan;
 using static CoachDesk.Common.ApplicationConstants;
 using static CoachDesk.Common.EntityValidation.MembershipPlan;
 

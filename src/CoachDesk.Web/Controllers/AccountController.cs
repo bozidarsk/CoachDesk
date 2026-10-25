@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CoachDesk.Data;
-using CoachDesk.ViewModels;
+using CoachDesk.ViewModels.Account;
 using static CoachDesk.Common.ApplicationConstants;
 using static CoachDesk.Common.EntityValidation.User;
 

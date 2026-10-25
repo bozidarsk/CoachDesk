@@ -4,8 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using CoachDesk.Data;
 using CoachDesk.Data.Models;
-using CoachDesk.ViewModels;
-using CoachDesk.ViewModels.Enums;
+using CoachDesk.ViewModels.Coach;
+using CoachDesk.ViewModels.Membership;
+using CoachDesk.ViewModels.MembershipPlan;
+using CoachDesk.ViewModels.Session;
+using CoachDesk.ViewModels.WorkPeriod;
 using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;

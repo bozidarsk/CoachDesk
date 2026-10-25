@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using CoachDesk.Data;
-using CoachDesk.ViewModels;
-using static CoachDesk.Common.ApplicationConstants;
 using Microsoft.EntityFrameworkCore;
+using CoachDesk.Data;
 using CoachDesk.Data.Models;
+using CoachDesk.ViewModels.Session;
+using static CoachDesk.Common.ApplicationConstants;
 
 namespace CoachDesk.Controllers;
 
