@@ -9,4 +9,5 @@ public class SessionBookViewModel
 	public string? ClientMembershipStatus { set; get; }
 	public IReadOnlyList<SessionViewModel> CoachUpcomingSessions { set; get; } = null!;
 	public IReadOnlyList<WorkPeriodViewModel> CoachWorkPeriods { set; get; } = null!;
+	public IReadOnlyList<(Guid Id, string Name)>? CoachesDropdown { set; get; }
 }

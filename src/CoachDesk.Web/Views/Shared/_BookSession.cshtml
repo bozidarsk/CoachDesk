@@ -3,6 +3,8 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @using static CoachDesk.Common.ApplicationConstants;
 
+@using QueryParameter = KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>
+
 @attribute [Authorize(Roles = ClientRole)]
 
 @{
@@ -34,6 +36,49 @@
 
 <div class="card h-100">
 	<div class="card-header fw-bold">Book a session</div>
+
+	@if (Model.CoachesDropdown != null)
+	{
+		<div class="dropdown d-flex align-self-end">
+			<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+				@if (Context.Request.Query["SelectedCoachId"].FirstOrDefault() is string selectedCoachId)
+				{
+					<span>@Model.CoachesDropdown.FirstOrDefault(x => x.Id.ToString() == selectedCoachId).Name</span>
+				}
+				else
+				{
+					<span>Pick a coach</span>
+				}
+			</button>
+
+			<ul class="dropdown-menu dropdown-menu-end">
+				@foreach (var x in Model.CoachesDropdown)
+				{
+					QueryString query;
+
+					@if (Context.Request.Query["SelectedCoachId"].Any())
+					{
+						query = QueryString.Create(
+							Context.Request.Query.Select(pair =>
+								pair.Key switch
+								{
+									"SelectedCoachId" => new QueryParameter(pair.Key, x.Id.ToString()),
+									_ => new QueryParameter(pair.Key, pair.Value),
+								}
+							)
+						);
+					}
+					else
+					{
+						query = Context.Request.QueryString.Add("SelectedCoachId", x.Id.ToString());
+					}
+
+					<li><a class="dropdown-item" href="@(Context.Request.Path + query)">@x.Name</a></li>
+				}
+			</ul>
+		</div>
+	}
+
 	<div class="card-body">
 		@if (TempData["SessionBookError"] is string sessionBookError)
 		{
