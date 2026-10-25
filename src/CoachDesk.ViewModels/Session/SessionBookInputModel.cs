@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CoachDesk.ViewModels.Session;
 
-public class SessionInputModel
+public class SessionBookInputModel
 {
 	[Required]
 	public Guid CoachId { set; get; }

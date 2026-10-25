@@ -14,7 +14,7 @@ public class SessionController : Controller
 	private readonly IMembershipService membershipService;
 
 	[HttpPost, Authorize(Roles = ClientRole)]
-	public async Task<IActionResult> Book(SessionInputModel model, string? returnUrl)
+	public async Task<IActionResult> Book(SessionBookInputModel model, string? returnUrl)
 	{
 		returnUrl ??= "/";
 
