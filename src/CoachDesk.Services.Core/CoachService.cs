@@ -113,6 +113,7 @@ public class CoachService : ICoachService
 	{
 		return await dbContext.Sessions
 			.Where(x => ((withClientId == null) ? x.CoachId == id : x.CoachId == id && x.ClientId == withClientId) && x.Date >= DateTime.UtcNow)
+			.OrderBy(x => x.Date)
 			.Select(x =>
 				new SessionModel()
 				{
