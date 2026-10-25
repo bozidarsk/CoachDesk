@@ -85,7 +85,11 @@
 			<div class="alert alert-danger">@sessionBookError</div>
 		}
 
-		@if (Model.ClientMembershipStatus != "Active")
+		@if (Model.CoachesDropdown != null && !Context.Request.Query["SelectedCoachId"].Any())
+		{
+			<p class="text-muted mb-0">Pick a coach to book sessions from.</p>
+		}
+		else if (Model.ClientMembershipStatus != "Active")
 		{
 			<p class="text-muted mb-0">You don't have an active membership from this coach. Purchase one first.</p>
 		}
