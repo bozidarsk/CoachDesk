@@ -8,6 +8,7 @@ namespace CoachDesk.Services.Core;
 public class MembershipPlanService : IMembershipPlanService
 {
 	private readonly ApplicationDbContext dbContext;
+	private readonly IMembershipService membershipService;
 
 	public async Task<MembershipPlanModel?> GetMembershipPlanAsync(Guid id)
 	{
@@ -39,6 +40,12 @@ public class MembershipPlanService : IMembershipPlanService
 					TimesUsed = x.TimesUsed,
 					MembershipPlanId = x.MembershipPlanId,
 					ClientId = x.ClientId,
+					Status = membershipService.GetMembershipStatus(
+						activatedOn: x.ActivatedOn,
+						timesUsed: x.TimesUsed,
+						duration: x.MembershipPlan.Duration,
+						count: x.MembershipPlan.Count
+					),
 				}
 			)
 			.ToListAsync()
@@ -89,8 +96,9 @@ public class MembershipPlanService : IMembershipPlanService
 		;
 	}
 
-	public MembershipPlanService(ApplicationDbContext dbContext)
+	public MembershipPlanService(ApplicationDbContext dbContext, IMembershipService membershipService)
 	{
 		this.dbContext = dbContext;
+		this.membershipService = membershipService;
 	}
 }

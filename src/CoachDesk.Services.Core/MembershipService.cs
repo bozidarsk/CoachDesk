@@ -60,13 +60,18 @@ public class MembershipService : IMembershipService
 			.SingleOrDefaultAsync(x => x.Id == id)
 		;
 
-		if (membership == null)
-			return null;
+		return (membership != null)
+			? GetMembershipStatus(membership.ActivatedOn, membership.TimesUsed, membership.MembershipPlan.Duration, membership.MembershipPlan.Count)
+		 	: null
+		;
+	}
 
-		if (membership.MembershipPlan.Duration != null && membership.ActivatedOn.AddDays((int)membership.MembershipPlan.Duration) <= DateTime.UtcNow)
+	public string GetMembershipStatus(DateTime activatedOn, int timesUsed, int? duration, int? count)
+	{
+		if (duration != null && activatedOn.AddDays((int)duration) <= DateTime.UtcNow)
 			return "Expired";
 
-		if (membership.MembershipPlan.Count != null && membership.TimesUsed >= membership.MembershipPlan.Count)
+		if (count != null && timesUsed >= count)
 			return "OutOfSessions";
 
 		return "Active";
