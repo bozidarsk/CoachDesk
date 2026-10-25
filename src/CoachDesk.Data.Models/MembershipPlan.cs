@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using static CoachDesk.Common.EntityValidation.MembershipPlan;
+using static CoachDesk.Data.Common.EntityValidation.MembershipPlan;
 
 namespace CoachDesk.Data.Models;
 

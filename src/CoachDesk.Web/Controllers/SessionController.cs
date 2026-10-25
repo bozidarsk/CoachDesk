@@ -4,7 +4,7 @@ using CoachDesk.ViewModels.Session;
 using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
-namespace CoachDesk.Controllers;
+namespace CoachDesk.Web.Controllers;
 
 public class SessionController : Controller
 {

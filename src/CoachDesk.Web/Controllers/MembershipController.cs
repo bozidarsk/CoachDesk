@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
-namespace CoachDesk.Controllers;
+namespace CoachDesk.Web.Controllers;
 
 [Authorize(Roles = ClientRole)]
 public class MembershipController : Controller

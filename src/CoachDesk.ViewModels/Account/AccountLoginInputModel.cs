@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-using static CoachDesk.Common.EntityValidation.User;
+using static CoachDesk.Data.Common.EntityValidation.User;
 
 namespace CoachDesk.ViewModels.Account;
 

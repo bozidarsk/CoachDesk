@@ -2,13 +2,13 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.ViewModels.Account;
 using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
-using static CoachDesk.Common.EntityValidation.User;
+using static CoachDesk.Data.Common.EntityValidation.User;
 
-namespace CoachDesk.Controllers;
+namespace CoachDesk.Web.Controllers;
 
 public class AccountController : Controller
 {

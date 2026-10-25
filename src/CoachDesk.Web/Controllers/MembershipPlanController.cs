@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.ViewModels.MembershipPlan;
 using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
-using static CoachDesk.Common.EntityValidation.MembershipPlan;
+using static CoachDesk.Data.Common.EntityValidation.MembershipPlan;
 
-namespace CoachDesk.Controllers;
+namespace CoachDesk.Web.Controllers;
 
 [Authorize(Roles = CoachRole)]
 public class MembershipPlanController : Controller

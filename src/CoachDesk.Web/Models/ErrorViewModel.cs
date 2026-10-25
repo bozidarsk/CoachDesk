@@ -1,4 +1,4 @@
-namespace CoachDesk.Models;
+namespace CoachDesk.Web.Models;
 
 public class ErrorViewModel
 {

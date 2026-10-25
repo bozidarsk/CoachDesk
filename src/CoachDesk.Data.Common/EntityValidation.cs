@@ -1,4 +1,4 @@
-namespace CoachDesk.Common;
+namespace CoachDesk.Data.Common;
 
 public static class EntityValidation
 {

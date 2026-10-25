@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace CoachDesk.Data;
+namespace CoachDesk.Data.Models;
 
 public class ApplicationUser : IdentityUser
 {

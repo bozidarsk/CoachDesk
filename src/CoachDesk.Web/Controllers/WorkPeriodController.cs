@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.ViewModels.WorkPeriod;
 using CoachDesk.Services.Core.Contracts;
 using static CoachDesk.Common.ApplicationConstants;
 
-namespace CoachDesk.Controllers;
+namespace CoachDesk.Web.Controllers;
 
 [Authorize(Roles = CoachRole)]
 public class WorkPeriodController : Controller

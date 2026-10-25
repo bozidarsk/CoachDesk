@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using CoachDesk.Data;
-using CoachDesk.Models;
+using CoachDesk.Data.Models;
+using CoachDesk.Web.Models;
 using static CoachDesk.Common.ApplicationConstants;
 
-namespace CoachDesk.Controllers;
+namespace CoachDesk.Web.Controllers;
 
 public class HomeController : Controller
 {

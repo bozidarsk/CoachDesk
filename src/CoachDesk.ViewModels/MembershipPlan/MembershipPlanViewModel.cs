@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using static CoachDesk.Common.EntityValidation.MembershipPlan;
+using static CoachDesk.Data.Common.EntityValidation.MembershipPlan;
 
 namespace CoachDesk.ViewModels.MembershipPlan;
 

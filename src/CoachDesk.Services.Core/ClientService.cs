@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.Services.Models;
 using CoachDesk.Services.Core.Contracts;
 

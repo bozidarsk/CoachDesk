@@ -1,4 +1,4 @@
-using CoachDesk.Data;
+using CoachDesk.Data.Models;
 using CoachDesk.Services.Models;
 
 namespace CoachDesk.Services.Core.Contracts;
