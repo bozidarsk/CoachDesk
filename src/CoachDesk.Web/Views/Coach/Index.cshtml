@@ -11,6 +11,18 @@
 		("Current clients", Model.ActiveClients.ToString()),
 		("Membership plans", Model.MembershipPlans.Count.ToString()),
 	};
+
+	var sessionBookViewModel = Model.ClientViewing
+		? new SessionBookViewModel()
+			{
+				CoachId = Model.Id,
+				ClientId = (Guid)Model.ViewingClientId!,
+				ClientMembershipStatus = Model.ViewingClientMembershipStatus,
+				CoachUpcomingSessions = Model.UpcomingSessions,
+				CoachWorkPeriods = Model.WorkPeriods,
+			}
+		: null
+	;
 }
 
 <div class="card shadow-sm mb-4">
@@ -156,7 +168,7 @@ else
 		</div>
 
 		<div class="col-lg-6">
-			<partial name="_BookSession"/>
+			<partial name="_BookSession" model="sessionBookViewModel"/>
 		</div>
 	}
 </div>

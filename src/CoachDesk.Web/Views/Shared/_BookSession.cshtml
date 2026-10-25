@@ -1,4 +1,4 @@
-@model CoachIndexViewModel
+@model SessionBookViewModel
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Http.Extensions
 @using static CoachDesk.Common.ApplicationConstants;
@@ -11,7 +11,7 @@
 	var bookingHorizonDays = 60;
 
 	var bookingWorkPeriods = Json.Serialize(
-		Model.WorkPeriods.Select(x =>
+		Model.CoachWorkPeriods.Select(x =>
 			new
 			{
 				day = (int)x.DayOfWeek,
@@ -22,7 +22,7 @@
 	);
 
 	var bookingBooked = Json.Serialize(
-		Model.UpcomingSessions.Select(x =>
+		Model.CoachUpcomingSessions.Select(x =>
 			new
 			{
 				start = x.Date,
@@ -40,11 +40,11 @@
 			<div class="alert alert-danger">@sessionBookError</div>
 		}
 
-		@if (Model.ViewingClientMembershipStatus != "Active")
+		@if (Model.ClientMembershipStatus != "Active")
 		{
 			<p class="text-muted mb-0">You don't have an active membership from this coach. Purchase one first.</p>
 		}
-		else if (!Model.WorkPeriods.Any())
+		else if (!Model.CoachWorkPeriods.Any())
 		{
 			<p class="text-muted mb-0">This coach hasn't set any free hours yet. Check back soon.</p>
 		}
@@ -75,8 +75,8 @@
 			<div id="bk-slots"></div>
 
 			<form class="mt-3" asp-controller="Session" asp-action="Book" asp-route-returnUrl="@Context.Request.GetEncodedPathAndQuery()" method="post">
-				<input type="hidden" name="CoachId" value="@Model.Id"/>
-				<input type="hidden" name="ClientId" value="@Model.ViewingClientId"/>
+				<input type="hidden" name="CoachId" value="@Model.CoachId"/>
+				<input type="hidden" name="ClientId" value="@Model.ClientId"/>
 				<input type="hidden" name="Date" id="bk-scheduled-at"/>
 				<input type="hidden" name="Duration" value="@TimeSpan.FromMinutes(bookingSessionMinutes)"/>
 				<div class="small text-muted mb-2" id="bk-summary">Pick a day and a time.</div>
