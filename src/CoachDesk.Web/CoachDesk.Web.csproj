@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoachDesk.Common\CoachDesk.Common.csproj" />
+    <ProjectReference Include="..\CoachDesk.Data.Common\CoachDesk.Data.Common.csproj" />
+    <ProjectReference Include="..\CoachDesk.Data\CoachDesk.Data.csproj" />
+  </ItemGroup>
+
+</Project>
