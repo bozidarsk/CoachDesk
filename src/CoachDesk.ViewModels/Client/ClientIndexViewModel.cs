@@ -11,9 +11,6 @@ public class ClientIndexViewModel
 	public DateTime MemberSince { set; get; }
 	public string Initials { set; get; } = null!;
 
-	public int SessionsCompleted { get; set; }
-	public int StreakWeeks { get; set; }
-
 	public bool IsLoggedIn { set; get; }
 	public bool OwnerViewing { set; get; }
 	public bool CoachOfClientViewing { set; get; }

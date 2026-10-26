@@ -2,17 +2,6 @@
 
 @{
 	ViewData["Title"] = Model.FullName;
-
-	var stats = new List<(string, string)>()
-	{
-		("Sessions completed", Model.SessionsCompleted.ToString()),
-		("Current streak", Model.StreakWeeks == 1 ? "1 week" : $"{Model.StreakWeeks} weeks")
-	};
-
-	if (Model.OwnerViewing || Model.CoachOfClientViewing)
-	{
-		stats.Add(("Active memberships", Model.Memberships.Count(x => x.Status == "Active").ToString()));
-	}
 }
 
 <div class="card shadow-sm mb-4">
@@ -39,8 +28,6 @@
 		</div>
 	</div>
 </div>
-
-<partial name="_StatRow" model="stats"/>
 
 @if (!Model.OwnerViewing && !Model.CoachOfClientViewing)
 {

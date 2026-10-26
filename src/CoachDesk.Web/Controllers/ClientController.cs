@@ -111,8 +111,6 @@ public class ClientController : Controller
 				IsLoggedIn = isLoggedIn,
 				OwnerViewing = ownerViewing,
 				CoachOfClientViewing = coachOfClientViewing,
-				SessionsCompleted = 0,
-				StreakWeeks = 0,
 				Memberships = memberships,
 				UpcomingSessions = upcomingSessions,
 			}
@@ -170,8 +168,6 @@ public class ClientController : Controller
 			{
 				ClientId = client.Id,
 				FullName = client.FullName,
-				SessionsCompleted = 0,
-				StreakWeeks = 0,
 				Memberships = memberships,
 				UpcomingSessions = upcomingSessions,
 				SessionBooking = (selectedCoach != null)
