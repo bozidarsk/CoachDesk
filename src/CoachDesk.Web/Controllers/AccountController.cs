@@ -66,6 +66,7 @@ public class AccountController : Controller
 			UserName = model.Email,
 			Email = model.Email,
 			FullName = model.FullName,
+			MemberSince = DateTime.UtcNow,
 		};
 
 		var result = await userManager.CreateAsync(user, model.Password);
