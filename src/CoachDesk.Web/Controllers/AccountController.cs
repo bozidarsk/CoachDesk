@@ -26,6 +26,9 @@ public class AccountController : Controller
 	[HttpGet, AllowAnonymous]
 	public IActionResult Register(string? returnUrl, bool? registerAsCoach)
 	{
+		if (signInManager.IsSignedIn(User))
+			return Forbid();
+
 		returnUrl ??= "/";
 
 		ViewData["ReturnUrl"] = returnUrl;
@@ -41,6 +44,9 @@ public class AccountController : Controller
 	[HttpPost, AllowAnonymous]
 	public async Task<IActionResult> Register(AccountRegisterInputModel model, string? returnUrl)
 	{
+		if (signInManager.IsSignedIn(User))
+			return Forbid();
+
 		returnUrl ??= "/";
 
 		ViewData["ReturnUrl"] = returnUrl;
@@ -95,6 +101,9 @@ public class AccountController : Controller
 	[HttpGet, AllowAnonymous]
 	public IActionResult Login(string? returnUrl)
 	{
+		if (signInManager.IsSignedIn(User))
+			return Forbid();
+
 		returnUrl ??= "/";
 
 		ViewData["ReturnUrl"] = returnUrl;
@@ -105,6 +114,9 @@ public class AccountController : Controller
 	[HttpPost, AllowAnonymous]
 	public async Task<IActionResult> Login(AccountLoginInputModel model, string returnUrl)
 	{
+		if (signInManager.IsSignedIn(User))
+			return Forbid();
+
 		returnUrl ??= "/";
 
 		ViewData["ReturnUrl"] = returnUrl;
