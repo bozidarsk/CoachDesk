@@ -1,8 +1,119 @@
-﻿@{
-	ViewData["Title"] = "Home Page";
+@{
+	ViewData["Title"] = "Welcome";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="row align-items-center g-5 py-4">
+	<div class="col-lg-6">
+		<h1 class="display-5 fw-bold mb-3">Find a coach, pick a plan, book a session.</h1>
+		<p class="lead text-muted mb-4">
+			CoachDesk is where coaches publish the hours they are free and the membership plans they offer,
+			and where clients find them and book.
+		</p>
+		<div class="d-flex flex-wrap gap-2 mb-3">
+			<a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register" asp-route-registerAsCoach="false">Join as a client</a>
+			<a class="btn btn-outline-primary btn-lg" asp-controller="Account" asp-action="Register" asp-route-registerAsCoach="true">Join as a coach</a>
+		</div>
+		<div class="text-muted">
+			Already have an account? <a asp-controller="Account" asp-action="Login">Log in</a>
+		</div>
+	</div>
+
+	<div class="col-lg-6">
+		<div class="card shadow-sm" aria-hidden="true">
+			<div class="card-header d-flex align-items-center">
+				<span class="fw-bold me-auto">Book a session</span>
+				<span class="small text-muted">Example</span>
+			</div>
+			<div class="card-body">
+				<div class="small text-muted mb-1">Tuesday</div>
+				<div class="d-flex flex-wrap gap-2 mb-3">
+					<button class="btn btn-sm btn-outline-primary" type="button" tabindex="-1" disabled>09:00</button>
+					<button class="btn btn-sm btn-primary" type="button" tabindex="-1" disabled>11:00</button>
+					<button class="btn btn-sm btn-outline-primary" type="button" tabindex="-1" disabled>14:30</button>
+				</div>
+				<div class="small text-muted mb-1">Thursday</div>
+				<div class="d-flex flex-wrap gap-2 mb-3">
+					<button class="btn btn-sm btn-outline-primary" type="button" tabindex="-1" disabled>10:00</button>
+					<button class="btn btn-sm btn-outline-primary" type="button" tabindex="-1" disabled>16:00</button>
+				</div>
+				<div class="small text-muted">Only times when the coach is free are shown.</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="py-4">
+	<h2 class="h3 mb-4">What you can do</h2>
+	<div class="row g-4">
+		<div class="col-md-6">
+			<div class="card h-100">
+				<div class="card-body">
+					<h3 class="h5 mb-3">As a client</h3>
+					<ul class="list-unstyled mb-0">
+						<li class="mb-2"><strong>Find the right coach.</strong> Search by the days and times a coach is free, and by plan price, length and number of sessions.</li>
+						<li class="mb-2"><strong>Buy a membership plan</strong> from the coach you choose.</li>
+						<li class="mb-2"><strong>Book and cancel sessions</strong> on a calendar that only offers free times.</li>
+						<li class="mb-2"><strong>Keep track.</strong> See your memberships, when they expire and which sessions are coming up.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="card h-100">
+				<div class="card-body">
+					<h3 class="h5 mb-3">As a coach</h3>
+					<ul class="list-unstyled mb-0">
+						<li class="mb-2"><strong>Set your weekly hours.</strong> Clients can only book inside the time you say you are free.</li>
+						<li class="mb-2"><strong>Create membership plans</strong> with a price, a number of sessions and how long they last.</li>
+						<li class="mb-2"><strong>See your clients</strong> with their memberships and next sessions on one dashboard.</li>
+						<li><strong>Manage sessions.</strong> Cancel a session or a membership when plans change.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="py-4">
+	<h2 class="h3 mb-4">How it works</h2>
+	<div class="row g-4">
+		<div class="col-md-4">
+			<div class="d-flex gap-3">
+				<div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px">1</div>
+				<div>
+					<h3 class="h6">Coaches set the terms</h3>
+					<p class="text-muted mb-0">A coach adds weekly free hours and one or more membership plans, each with a price, a number of sessions and a validity period.</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="d-flex gap-3">
+				<div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px">2</div>
+				<div>
+					<h3 class="h6">Clients choose a plan</h3>
+					<p class="text-muted mb-0">A client searches for a coach that fits their schedule and budget, opens the profile and purchases a membership.</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="d-flex gap-3">
+				<div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px">3</div>
+				<div>
+					<h3 class="h6">Sessions get booked</h3>
+					<p class="text-muted mb-0">The client picks a day and a free time. Times that are taken, or outside the coach's hours, never show up.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="bg-light rounded p-4 p-md-5 text-center my-4">
+	<h2 class="h3 mb-2">Ready to start?</h2>
+	<p class="text-muted mb-4">Create an account in a minute and choose whether you are here to coach or to train.</p>
+	<div class="d-flex flex-wrap justify-content-center gap-2">
+		<a class="btn btn-primary" asp-controller="Account" asp-action="Register" asp-route-registerAsCoach="false">Join as a client</a>
+		<a class="btn btn-outline-primary" asp-controller="Account" asp-action="Register" asp-route-registerAsCoach="true">Join as a coach</a>
+		<a class="btn btn-link" asp-controller="Account" asp-action="Login">Log in</a>
+	</div>
+</section>

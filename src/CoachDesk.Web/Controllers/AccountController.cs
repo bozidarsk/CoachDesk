@@ -21,13 +21,18 @@ public class AccountController : Controller
 	public IActionResult Index() => View();
 
 	[HttpGet, AllowAnonymous]
-	public IActionResult Register(string? returnUrl)
+	public IActionResult Register(string? returnUrl, bool? registerAsCoach)
 	{
 		returnUrl ??= "/";
 
 		ViewData["ReturnUrl"] = returnUrl;
 
-		return View();
+		return View(
+			new AccountRegisterInputModel()
+			{
+				RegisterAsCoach = registerAsCoach ?? false,
+			}
+		);
 	}
 
 	[HttpPost, AllowAnonymous]
