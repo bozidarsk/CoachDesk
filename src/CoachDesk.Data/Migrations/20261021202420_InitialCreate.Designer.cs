@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CoachDesk.Migrations
+namespace CoachDesk.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20261021202420_InitialCreate")]

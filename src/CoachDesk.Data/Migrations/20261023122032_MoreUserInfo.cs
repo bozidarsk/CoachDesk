@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CoachDesk.Migrations
+namespace CoachDesk.Data.Migrations
 {
     /// <inheritdoc />
     public partial class MoreUserInfo : Migration
