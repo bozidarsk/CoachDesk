@@ -20,7 +20,15 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IWorkPeriodService, WorkPeriodService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(
+	options => options
+	.UseSqlServer(
+		builder.Configuration.GetConnectionString("DefaultConnection"),
+		options => options
+			.MigrationsAssembly(typeof(ApplicationDbContext).Assembly)
+	)
+);
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 	{
 		options.SignIn.RequireConfirmedAccount = false;

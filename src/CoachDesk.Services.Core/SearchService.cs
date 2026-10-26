@@ -18,6 +18,8 @@ public class SearchService : ISearchService
 	{
 		return await dbContext.Coaches
 			.Where(x =>
+				x.User != null
+				&&
 				(name == null || EF.Functions.Like(matchExpression: x.User.FullName, pattern: name))
 				&&
 				x.WorkPeriods.Any(x =>
@@ -32,9 +34,9 @@ public class SearchService : ISearchService
 				new CoachModel()
 				{
 					Id = x.Id,
-					FullName = x.User.FullName,
-					MemberSince = x.User.MemberSince,
-					Bio = x.User.Bio,
+					FullName = x.User!.FullName,
+					MemberSince = x.User!.MemberSince,
+					Bio = x.User!.Bio,
 				}
 			)
 			.ToListAsync()

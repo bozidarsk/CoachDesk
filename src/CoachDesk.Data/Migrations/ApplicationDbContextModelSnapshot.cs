@@ -22,7 +22,7 @@ namespace CoachDesk.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CoachDesk.Data.ApplicationUser", b =>
+            modelBuilder.Entity("CoachDesk.Data.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -104,7 +104,6 @@ namespace CoachDesk.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -121,7 +120,6 @@ namespace CoachDesk.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -164,7 +162,7 @@ namespace CoachDesk.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CoachId")
+                    b.Property<Guid>("CoachId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Count")
@@ -375,22 +373,20 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("CoachDesk.Data.Models.Client", b =>
                 {
-                    b.HasOne("CoachDesk.Data.ApplicationUser", "User")
+                    b.HasOne("CoachDesk.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachDesk.Data.Models.Coach", b =>
                 {
-                    b.HasOne("CoachDesk.Data.ApplicationUser", "User")
+                    b.HasOne("CoachDesk.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
@@ -419,7 +415,8 @@ namespace CoachDesk.Data.Migrations
                     b.HasOne("CoachDesk.Data.Models.Coach", "Coach")
                         .WithMany("MembershipPlans")
                         .HasForeignKey("CoachId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Coach");
                 });
@@ -465,7 +462,7 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("CoachDesk.Data.ApplicationUser", null)
+                    b.HasOne("CoachDesk.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -474,7 +471,7 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("CoachDesk.Data.ApplicationUser", null)
+                    b.HasOne("CoachDesk.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -489,7 +486,7 @@ namespace CoachDesk.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoachDesk.Data.ApplicationUser", null)
+                    b.HasOne("CoachDesk.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -498,7 +495,7 @@ namespace CoachDesk.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("CoachDesk.Data.ApplicationUser", null)
+                    b.HasOne("CoachDesk.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

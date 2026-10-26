@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using static CoachDesk.Data.Common.EntityValidation.MembershipPlan;
 
 namespace CoachDesk.Data.Models;
@@ -21,9 +20,8 @@ public class MembershipPlan
 	public int? Duration { set; get; }
 
 	[ForeignKey(nameof(Coach))]
-	public Guid? CoachId { set; get; }
-	[DeleteBehavior(DeleteBehavior.SetNull)]
-	public virtual Coach? Coach { set; get; }
+	public Guid CoachId { set; get; }
+	public virtual Coach Coach { set; get; } = null!;
 
 	public virtual ICollection<Membership> ActiveMemberships { set; get; } = [];
 }

@@ -42,9 +42,9 @@ public class ClientService : IClientService
 		return new()
 		{
 			Id = client.Id,
-			FullName = client.User.FullName,
-			MemberSince = client.User.MemberSince,
-			Bio = client.User.Bio,
+			FullName = client.User?.FullName ?? "Deleted User",
+			MemberSince = client.User?.MemberSince ?? default,
+			Bio = client.User?.Bio,
 		};
 	}
 

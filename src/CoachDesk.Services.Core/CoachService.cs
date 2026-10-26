@@ -41,9 +41,9 @@ public class CoachService : ICoachService
 		return new()
 		{
 			Id = coach.Id,
-			FullName = coach.User.FullName,
-			MemberSince = coach.User.MemberSince,
-			Bio = coach.User.Bio,
+			FullName = coach.User?.FullName ?? "Deleted User",
+			MemberSince = coach.User?.MemberSince ?? default,
+			Bio = coach.User?.Bio ,
 		};
 	}
 
@@ -76,14 +76,14 @@ public class CoachService : ICoachService
 	public async Task<IReadOnlyList<ClientModel>> GetClientsAsync(Guid id)
 	{
 		return await dbContext.Clients
-			.Where(x => x.ActiveMemberships.Any(x => x.MembershipPlan.CoachId == id))
+			.Where(x => x.User != null && x.ActiveMemberships.Any(x => x.MembershipPlan.CoachId == id))
 			.Select(x =>
 				new ClientModel()
 				{
 					Id = x.Id,
-					FullName = x.User.FullName,
-					MemberSince = x.User.MemberSince,
-					Bio = x.User.Bio,
+					FullName = x.User!.FullName,
+					MemberSince = x.User!.MemberSince,
+					Bio = x.User!.Bio,
 				}
 			)
 			.ToListAsync()

@@ -31,6 +31,8 @@ namespace CoachDesk.Data.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MemberSince = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -162,7 +164,7 @@ namespace CoachDesk.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -172,7 +174,7 @@ namespace CoachDesk.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -180,7 +182,7 @@ namespace CoachDesk.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -190,7 +192,7 @@ namespace CoachDesk.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -202,7 +204,7 @@ namespace CoachDesk.Data.Migrations
                     Price = table.Column<decimal>(type: "decimal(19,4)", nullable: false),
                     Count = table.Column<int>(type: "int", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
-                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -211,7 +213,8 @@ namespace CoachDesk.Data.Migrations
                         name: "FK_MembershipPlans_Coaches_CoachId",
                         column: x => x.CoachId,
                         principalTable: "Coaches",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -240,6 +243,27 @@ namespace CoachDesk.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WorkPeriods",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    Start = table.Column<TimeOnly>(type: "time", nullable: false),
+                    End = table.Column<TimeOnly>(type: "time", nullable: false),
+                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkPeriods", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkPeriods_Coaches_CoachId",
+                        column: x => x.CoachId,
+                        principalTable: "Coaches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Memberships",
                 columns: table => new
                 {
@@ -247,7 +271,7 @@ namespace CoachDesk.Data.Migrations
                     ActivatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TimesUsed = table.Column<int>(type: "int", nullable: false),
                     MembershipPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -256,7 +280,8 @@ namespace CoachDesk.Data.Migrations
                         name: "FK_Memberships_Clients_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Clients",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Memberships_MembershipPlans_MembershipPlanId",
                         column: x => x.MembershipPlanId,
@@ -338,6 +363,11 @@ namespace CoachDesk.Data.Migrations
                 name: "IX_Sessions_CoachId",
                 table: "Sessions",
                 column: "CoachId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkPeriods_CoachId",
+                table: "WorkPeriods",
+                column: "CoachId");
         }
 
         /// <inheritdoc />
@@ -363,6 +393,9 @@ namespace CoachDesk.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "WorkPeriods");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

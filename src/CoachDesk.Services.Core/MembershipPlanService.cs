@@ -24,7 +24,7 @@ public class MembershipPlanService : IMembershipPlanService
 			Price = membershipPlan.Price,
 			Count = membershipPlan.Count,
 			Duration = membershipPlan.Duration,
-			CoachId = membershipPlan.CoachId ?? throw new NotImplementedException(),
+			CoachId = membershipPlan.CoachId,
 		};
 	}
 
