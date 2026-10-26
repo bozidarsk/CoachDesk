@@ -16,7 +16,7 @@
 		<h1 class="h3 mb-0">Dashboard</h1>
 		<div class="text-muted">Welcome back, @Model.FullName</div>
 	</div>
-	<a class="btn btn-primary" asp-controller="Client" asp-action="SearchCoaches">Find a coach</a>
+	<a class="btn btn-primary" asp-controller="Search" asp-action="Coaches">Find a coach</a>
 	<a class="btn btn-outline-secondary" asp-controller="Client" asp-action="Index" asp-route-id="@Model.ClientId">View public profile</a>
 	<a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Index">Manage my account</a>
 </div>
@@ -30,7 +30,7 @@
 		{
 			<div class="card-body">
 				<p class="text-muted mb-3">You don't have a membership yet. Pick a coach and choose a plan to start booking sessions.</p>
-				<a class="btn btn-primary" asp-controller="Client" asp-action="SearchCoaches">Find a coach</a>
+				<a class="btn btn-primary" asp-controller="Search" asp-action="Coaches">Find a coach</a>
 			</div>
 		}
 		else

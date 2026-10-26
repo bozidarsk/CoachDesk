@@ -90,6 +90,13 @@ public class CoachService : ICoachService
 		;
 	}
 
+	public async Task<int> CountClientsAsync(Guid id)
+	{
+		return await dbContext.Clients
+			.CountAsync(x => x.ActiveMemberships.Any(x => x.MembershipPlan.CoachId == id))
+		;
+	}
+
 	public async Task<IReadOnlyList<MembershipPlanModel>> GetMembershipPlansAsync(Guid id)
 	{
 		return await dbContext.MembershipPlans

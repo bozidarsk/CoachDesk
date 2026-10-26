@@ -1,0 +1,214 @@
+@model SearchCoachesInputModel
+
+@{
+	ViewData["Title"] = "Find a coach";
+
+	var week = new[]
+	{
+		DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday
+	};
+
+	var hasPlanFilters = Model.MinPrice.HasValue || Model.MaxPrice.HasValue || Model.MinDurationDays.HasValue || Model.MinSessions.HasValue;
+
+	var hasFilters = hasPlanFilters || !string.IsNullOrWhiteSpace(Model.Name) || Model.Days.Any() || Model.AvailableFrom.HasValue || Model.AvailableTo.HasValue;
+
+	string PageLink(int page)
+	{
+		var pairs = Context.Request.Query
+			.Where(q => !string.Equals(q.Key, "Page", StringComparison.OrdinalIgnoreCase))
+			.SelectMany(q => q.Value.Select(v => Uri.EscapeDataString(q.Key) + "=" + Uri.EscapeDataString(v ?? string.Empty)))
+			.Append("Page=" + page)
+		;
+
+		return "?" + string.Join("&", pairs);
+	}
+}
+
+<div class="mb-4">
+	<h1 class="h3 mb-1">Find a coach</h1>
+	<div class="text-muted">Search by when a coach is free and what their membership plans look like.</div>
+</div>
+
+<form class="card mb-4" asp-controller="Search" asp-action="Coaches" method="get">
+	<div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+	<div class="card-body">
+		<div class="row g-4">
+			<div class="col-lg-6">
+				<div class="mb-3">
+					<label class="form-label" asp-for="Name">Coach name</label>
+					<input class="form-control" asp-for="Name" placeholder="Any name"/>
+				</div>
+
+				<div class="mb-3">
+					<div class="form-label">Free on</div>
+					<div class="d-flex flex-wrap gap-1">
+						@foreach (var day in week)
+						{
+							<input class="btn-check" type="checkbox" id="day-@((int)day)" name="Days" value="@((int)day)" checked="@Model.Days.Contains(day)" autocomplete="off"/>
+							<label class="btn btn-sm btn-outline-primary" for="day-@((int)day)">@day.ToString().Substring(0, 3)</label>
+						}
+					</div>
+					<div class="form-text">Leave empty for any day.</div>
+				</div>
+
+				<div class="row g-2">
+					<div class="col-6">
+						<label class="form-label" asp-for="AvailableFrom">Free from</label>
+						<input class="form-control" asp-for="AvailableFrom" type="time" step="60"/>
+					</div>
+					<div class="col-6">
+						<label class="form-label" asp-for="AvailableTo">Free until</label>
+						<input class="form-control" asp-for="AvailableTo" type="time" step="60"/>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-6">
+				<div class="row g-2 mb-3">
+					<span>Price</span>
+					<div class="col-6 input-group" style="width: 50%;">
+						<span class="input-group-text">From</span>
+						<input class="form-control" asp-for="MinPrice" type="number" min="0" step="0.01"/>
+					</div>
+					<div class="col-6 input-group" style="width: 50%;">
+						<span class="input-group-text">To</span>
+						<input class="form-control" asp-for="MaxPrice" type="number" min="0" step="0.01"/>
+					</div>
+				</div>
+
+				<div class="row g-2">
+					<div class="col-6">
+						<label class="form-label" asp-for="MinDurationDays">Valid for at least (days)</label>
+						<input class="form-control" asp-for="MinDurationDays" type="number" min="1" step="1"/>
+					</div>
+					<div class="col-6">
+						<label class="form-label" asp-for="MinSessions">Sessions included, at least</label>
+						<input class="form-control" asp-for="MinSessions" type="number" min="1" step="1"/>
+					</div>
+				</div>
+				<div class="form-text">Plans with no expiry or unlimited sessions always match these two.</div>
+			</div>
+		</div>
+	</div>
+	<div class="card-footer d-flex gap-2">
+		<button class="btn btn-primary" type="submit">Search</button>
+		@if (hasFilters)
+		{
+			<a class="btn btn-outline-secondary" asp-controller="Search" asp-action="Coaches">Clear filters</a>
+		}
+	</div>
+</form>
+
+<h2 class="h5 mb-3">@Model.TotalResults @(Model.TotalResults == 1 ? "coach" : "coaches") found</h2>
+
+@if (!Model.Results.Any())
+{
+	<div class="alert alert-light border">
+		No coaches match these filters. Try a wider price range, fewer days or a shorter minimum duration.
+	</div>
+}
+else
+{
+	foreach (var coach in Model.Results)
+	{
+		var byDay = coach.WorkPeriods
+			.GroupBy(x => x.DayOfWeek)
+			.ToDictionary(
+				g => g.Key,
+				g => g.OrderBy(x => x.Start).ToList()
+			)
+		;
+
+		<div class="card mb-3">
+			<div class="card-body">
+				<div class="row g-4">
+					<div class="col-lg-4">
+						<div class="d-flex gap-3">
+							<div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0"style="width:56px;height:56px">@coach.Initials</div>
+							<div>
+								<h3 class="h5 mb-1">
+									<a class="text-decoration-none" asp-controller="Coach" asp-action="Index" asp-route-id="@coach.Id">@coach.FullName</a>
+								</h3>
+								<div class="text-muted small">@coach.ActiveClients current @(coach.ActiveClients == 1 ? "client" : "clients")</div>
+							</div>
+						</div>
+
+						@if (!string.IsNullOrWhiteSpace(coach.Bio))
+						{
+							<p class="small mt-3 mb-0" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">@coach.Bio</p>
+						}
+
+						<div class="small text-muted mt-3 mb-1">Free hours</div>
+						@if (byDay.Count == 0)
+						{
+							<div class="small">No hours set yet</div>
+						}
+						@foreach (var day in week)
+						{
+							if (!byDay.TryGetValue(day, out var periods))
+							{
+								continue;
+							}
+							<div class="small">
+								<span class="fw-bold d-inline-block" style="width:2.75rem">@day.ToString().Substring(0, 3)</span>
+								@(string.Join(", ", periods.Select(p => p.Start.ToString("HH:mm") + " to " + p.End.ToString("HH:mm"))))
+							</div>
+						}
+
+						<a class="btn btn-sm btn-outline-primary mt-3" asp-controller="Coach" asp-action="Index" asp-route-id="@coach.Id">View profile</a>
+					</div>
+
+					<div class="col-lg-8">
+						<div class="small text-muted mb-2">
+							@(hasPlanFilters ? "Matching plans" : "Plans"): @coach.MatchingPlans.Count
+						</div>
+						<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-2">
+							@foreach (var plan in coach.MatchingPlans)
+							{
+								<div class="col">
+									<div class="border rounded p-3 h-100">
+										<div class="fw-bold">@plan.Name
+											@if (plan.MembershipStatus != null)
+											{
+												var css = plan.MembershipStatus switch
+												{
+													"Active" => "bg-success",
+													"Expired" or "OutOfSessions" => "bg-light",
+													_ => "",
+												};
+
+												<span class="badge rounded-pill @css text-dark border">@plan.MembershipStatus</span>
+											}
+										</div>
+										<div class="h5 my-1">@plan.Price.ToString("C")</div>
+										<ul class="list-unstyled small text-muted mb-0">
+											<li>@(plan.Count is int sessions ? (sessions == 1 ? "1 session" : sessions + " sessions") : "Unlimited sessions")</li>
+											<li>@(plan.Duration is int validDays ? (validDays == 1 ? "Valid for 1 day" : "Valid for " + validDays + " days") : "No expiry")</li>
+										</ul>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+
+	if (Model.TotalPages > 1)
+	{
+		<nav>
+			<ul class="pagination justify-content-center">
+				<li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+					<a class="page-link" href="@PageLink(Math.Max(1, Model.Page - 1))">Previous</a>
+				</li>
+				<li class="page-item disabled">
+					<span class="page-link">Page @Model.Page of @Model.TotalPages</span>
+				</li>
+				<li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+					<a class="page-link" href="@PageLink(Math.Min(Model.TotalPages, Model.Page + 1))">Next</a>
+				</li>
+			</ul>
+		</nav>
+	}
+}
