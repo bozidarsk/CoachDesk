@@ -233,8 +233,22 @@
 					{
 						<tr>
 							<td class="fw-bold">@plan.Name</td>
-							<td>@plan.Count</td>
-							<td>@(plan.Duration ?? 0) days</td>
+							@if (plan.Count != null)
+							{
+								<td>@plan.Count</td>
+							}
+							else
+							{
+								<td>Unlimited</td>
+							}
+							@if (plan.Duration != null)
+							{
+								<td>@plan.Duration days</td>
+							}
+							else
+							{
+								<td>Forever</td>
+							}
 							<td>@plan.Price.ToString("C")</td>
 							<td>@plan.ActiveClients</td>
 							<td class="text-end text-nowrap">

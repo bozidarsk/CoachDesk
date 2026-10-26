@@ -91,8 +91,22 @@ else
 						</h3>
 						<div class="h4 mb-3">@plan.Price.ToString("C")</div>
 						<ul class="list-unstyled text-muted flex-grow-1">
-							<li>@plan.Count sessions included</li>
-							<li>Valid for @(plan.Duration ?? 0) days</li>
+							@if (plan.Count != null)
+							{
+								<li>@plan.Count sessions included</li>
+							}
+							else
+							{
+								<li>Unlimited sessions included</li>
+							}
+							@if (plan.Duration != null)
+							{
+								<li>Valid for @plan.Duration.ToString() days</li>
+							}
+							else
+							{
+								<li>Valid forever</li>
+							}
 						</ul>
 						@if (Model.OwnerViewing)
 						{
