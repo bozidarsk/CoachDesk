@@ -148,8 +148,6 @@ public class AccountController : Controller
 		return LocalRedirect("/");
 	}
 
-	public IActionResult AccessDenied() => View();
-
 	private bool ValidateEmail(string email) => string.IsNullOrWhiteSpace(email) || Regex.IsMatch(email, "[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+");
 
 	private bool ValidatePassword(string password)

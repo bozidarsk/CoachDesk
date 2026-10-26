@@ -47,7 +47,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
 	options.LoginPath = "/Account/Login";
 	options.LogoutPath = "/Account/Logout";
-	options.AccessDeniedPath = "/Account/AccessDenied";
+	options.AccessDeniedPath = "/Home/Error/403";
 });
 
 var app = builder.Build();
@@ -60,13 +60,13 @@ using (var scope = app.Services.CreateScope())
 				await roleManager.CreateAsync(new IdentityRole(role));
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Home/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+	app.UseExceptionHandler("/Home/Error/500");
 	app.UseHsts();
 }
+
+app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
 
 app.UseHttpsRedirection();
 
