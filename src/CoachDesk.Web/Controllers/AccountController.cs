@@ -12,6 +12,7 @@ namespace CoachDesk.Web.Controllers;
 
 public class AccountController : Controller
 {
+	private readonly IAccountService accountService;
 	private readonly ICoachService coachService;
 	private readonly IClientService clientService;
 	private readonly UserManager<ApplicationUser> userManager;
@@ -49,10 +50,10 @@ public class AccountController : Controller
 			return View(model);
 		}
 
-		if (!ValidateEmail(model.Email))
+		if (!accountService.IsEmailValid(model.Email))
 			ModelState.AddModelError(nameof(model.Email), "Invalid email address was provided.");
 
-		if (!ValidatePassword(model.Password))
+		if (!accountService.IsPasswordValid(model.Password))
 			ModelState.AddModelError(nameof(model.Password), $"Password must be between {PasswordMinLength} and {PasswordMaxLength} characters and contain letters and digits.");
 
 		if (await userManager.FindByEmailAsync(model.Email) != null)
@@ -113,10 +114,10 @@ public class AccountController : Controller
 			return View(model);
 		}
 
-		if (!ValidateEmail(model.Email))
+		if (!accountService.IsEmailValid(model.Email))
 			ModelState.AddModelError(nameof(model.Email), "Invalid email address was provided.");
 
-		if (!ValidatePassword(model.Password))
+		if (!accountService.IsPasswordValid(model.Password))
 			ModelState.AddModelError(nameof(model.Password), $"Password must be between {PasswordMinLength} and {PasswordMaxLength} characters and contain letters and digits.");
 
 		if (!ModelState.IsValid)
@@ -154,29 +155,15 @@ public class AccountController : Controller
 		return LocalRedirect("/");
 	}
 
-	private bool ValidateEmail(string email) => string.IsNullOrWhiteSpace(email) || Regex.IsMatch(email, "[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+");
-
-	private bool ValidatePassword(string password)
-	{
-		if (string.IsNullOrEmpty(password))
-			return false;
-
-		if (password.Length < PasswordMinLength || password.Length > PasswordMaxLength)
-			return false;
-
-		if (!password.Any(x => char.IsDigit(x)))
-			return false;
-
-		return true;
-	}
-
 	public AccountController(
+		IAccountService accountService,
 		ICoachService coachService,
 		IClientService clientService,
 		UserManager<ApplicationUser> userManager,
 		SignInManager<ApplicationUser> signInManager
 	)
 	{
+		this.accountService = accountService;
 		this.coachService = coachService;
 		this.clientService = clientService;
 		this.userManager = userManager;
