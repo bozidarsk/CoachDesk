@@ -1,3 +1,39 @@
-<h1>Manage your account here</h1>
+@model AccountIndexViewModel
 
-<a asp-controller="Account" asp-action="Delete">Delete account.</a>
+@{
+	ViewData["Title"] = "My Account";
+}
+
+<div class="row justify-content-center">
+	<div class="col-lg-8">
+		<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+			<div class="me-auto">
+				<h1 class="h3 mb-0">My account</h1>
+				<div class="text-muted">Member since @Model.MemberSince.ToString("MMMM yyyy")</div>
+			</div>
+			<a class="btn btn-outline-secondary" asp-controller="@Model.ProfileController" asp-action="Dashboard">Back to dashboard</a>
+			<a class="btn btn-outline-secondary" asp-controller="@Model.ProfileController" asp-action="Index" asp-route-id="@Model.ProfileId">View public profile</a>
+		</div>
+
+		@if (TempData["AccountIndexMessage"] is string accountMessage)
+		{
+			<div class="alert alert-success">@accountMessage</div>
+		}
+
+		@if (TempData["AccountIndexError"] is string accountError)
+		{
+			<div class="alert alert-danger">@accountError</div>
+		}
+
+		<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+		<partial name="_AccountUpdateProfile" model="Model.UpdateProfile"/>
+		<partial name="_AccountChangeEmail" model="Model.ChangeEmail"/>
+		<partial name="_AccountChangePassword" model="Model.ChangePassword"/>
+		<partial name="_AccountDelete" model="Model.Delete"/>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial"/>
+}
