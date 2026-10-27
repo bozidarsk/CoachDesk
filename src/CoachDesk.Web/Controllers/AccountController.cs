@@ -148,7 +148,7 @@ public class AccountController : Controller
 		return LocalRedirect(returnUrl);
 	}
 
-	[HttpPost]
+	[HttpGet]
 	public async Task<IActionResult> Logout(string? returnUrl)
 	{
 		returnUrl ??= "/";
