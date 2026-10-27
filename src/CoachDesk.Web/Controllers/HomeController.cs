@@ -31,11 +31,6 @@ public class HomeController : Controller
 		return View();
 	}
 
-	public IActionResult Privacy()
-	{
-		return View();
-	}
-
 	public IActionResult Error(int id)
 	{
 		if (id < 400 || id > 599)
