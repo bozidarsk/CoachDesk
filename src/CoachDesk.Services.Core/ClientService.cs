@@ -11,7 +11,7 @@ public class ClientService : IClientService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMembershipService membershipService;
 
-	public async Task<CoachModel?> GetClientAsync(ApplicationUser user)
+	public async Task<ClientModel?> GetClientAsync(ApplicationUser user)
 	{
 		var client = await dbContext.Clients
 			.SingleOrDefaultAsync(x => x.UserId == user.Id)
@@ -29,7 +29,7 @@ public class ClientService : IClientService
 		};
 	}
 
-	public async Task<CoachModel?> GetClientAsync(Guid id)
+	public async Task<ClientModel?> GetClientAsync(Guid id)
 	{
 		var client = await dbContext.Clients
 			.Include(x => x.User)
