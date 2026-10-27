@@ -3,7 +3,7 @@ namespace CoachDesk.Services.Models;
 public class ClientModel
 {
 	public Guid Id;
-	public string FullName { set; get; }
+	public string FullName { set; get; } = null!;
 	public DateTime MemberSince { set; get; }
 	public string? Bio { set; get; }
 }
