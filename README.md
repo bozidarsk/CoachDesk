@@ -116,7 +116,7 @@ Open the URL printed in the console (for example `https://localhost:8000`). If t
 
 In Development the app also creates demo accounts, plans, memberships and sessions. It only does this when the database has no coaches or clients yet. Dates are relative to the day you run it, so there are always upcoming sessions.
 
-All demo accounts use the password `Passw0rd!`. This is for local development only.
+All demo accounts use the password `1234567890`. This is for local development only.
 
 | Email | Role | What it shows |
 |---|---|---|
