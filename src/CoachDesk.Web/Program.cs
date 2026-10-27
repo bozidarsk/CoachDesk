@@ -54,10 +54,13 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-	var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-		foreach (var role in new[] { CoachRole, ClientRole })
-			if (!await roleManager.RoleExistsAsync(role))
-				await roleManager.CreateAsync(new IdentityRole(role));
+	var services = scope.ServiceProvider;
+	await services.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+
+	await ApplicationDbSeeder.SeedRolesAsync(services);
+
+	if (app.Environment.IsDevelopment())
+		await ApplicationDbSeeder.SeedDemoDataAsync(services);
 }
 
 if (!app.Environment.IsDevelopment())

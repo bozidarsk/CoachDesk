@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoachDesk.Common\CoachDesk.Common.csproj" />
     <ProjectReference Include="..\CoachDesk.Data.Models\CoachDesk.Data.Models.csproj" />
   </ItemGroup>
 
