@@ -71,7 +71,7 @@ docker container start mssql-server
 
 ### 3. Configure the connection string
 
-`appsettings.json` and `appsettings.Development.json` both contain a default `ConnectionStrings:DefaultConnection`. It points at the SQL Server from step 2 (`localhost,1433`, login `sa`, database `CoachDesk`), so with the container above nothing needs to change.
+`appsettings.json` and `appsettings.Development.json` both contain a default `ConnectionStrings:DefaultConnection`.
 
 To use a different server or password, override the value with an environment variable instead of editing the files. Environment variables win over both `appsettings` files. Use a double underscore in place of `:`.
 
