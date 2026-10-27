@@ -1,4 +1,5 @@
 bin/
 obj/
+.vs/
 secrets.json
 .env
